@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sistema Milagro | v39 Fotos Grandes</title>
+    <title>Sistema Milagro | v40 Final</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -37,7 +37,7 @@
         .view-section { display: none; }
         .view-section.active { display: block; animation: fadeIn 0.3s; }
 
-        /* ELEMENTOS UI */
+        /* INPUTS & LISTAS */
         .item-container { border: 1px solid #eee; background: #fafafa; padding: 8px; margin-bottom: 8px; border-radius: 6px; }
         .dynamic-row { display: flex; gap: 5px; margin-bottom: 5px; }
         input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 0.9em; }
@@ -72,14 +72,12 @@
         .efficiency-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.5s; }
         .efficiency-text { text-align: center; font-weight: bold; font-size: 0.9em; margin-top: 5px; color: #333; }
 
-        /* DASHBOARD KPIS */
+        /* KPIS & USERS */
         .kpi-row { display: flex; justify-content: space-between; margin-bottom: 15px; gap: 10px; }
         .kpi-card { flex: 1; padding: 15px; border-radius: 8px; color: white; text-align: center; }
         .kpi-card.green { background: linear-gradient(135deg, #2ecc71, #27ae60); }
         .kpi-card.blue { background: linear-gradient(135deg, #3498db, #2980b9); }
         .kpi-card strong { font-size: 1.4em; display: block; }
-
-        /* GESTIÓN USUARIOS */
         .zones-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin: 10px 0; text-align: left; max-height: 150px; overflow-y: auto; background: #fff; border: 1px solid #ddd; padding: 5px; }
         .zone-check { display: flex; align-items: center; font-size: 0.85em; padding: 5px; border-bottom: 1px solid #eee; }
         .user-item { display: flex; justify-content: space-between; background: #fff; padding: 10px; border-bottom: 1px solid #eee; align-items: center; }
@@ -91,12 +89,11 @@
         .modal-counter { font-size: 2.5em; font-weight: bold; text-align: center; margin: 10px 0; display: block; color: #c0392b; }
         .close-modal { position: absolute; top: 10px; right: 15px; font-size: 28px; font-weight: bold; cursor: pointer; }
         
-        /* LOADING */
         #loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); z-index: 30000; justify-content: center; align-items: center; flex-direction: column; }
         .spinner { border: 8px solid #f3f3f3; border-top: 8px solid #3498db; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* IMPRESIÓN (PDF MEJORADO FOTOS GIGANTES) */
+        /* IMPRESIÓN (PDF AJUSTADO VERTICAL) */
         #seccion-impresion { display: none; }
         @media print {
             body { background: white; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; color: #333; }
@@ -113,7 +110,6 @@
             .pdf-sum-row { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 12px; }
             .pdf-sum-row.plus { color: #27ae60; font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 3px; }
             .pdf-sum-row.minus { color: #c0392b; }
-            .pdf-comision-box { background: #fff3cd; border: 1px solid #ffeeba; padding: 2px; font-weight: bold; color: #856404; }
             .pdf-neto-box { border-top: 3px double #333; margin-top: 5px; padding-top: 5px; font-size: 16px; font-weight: bold; color: #2c3e50; text-align: right; background: #eaf2f8; padding: 5px; }
             .pdf-pressure-box { border: 2px solid #2c3e50; background: #f4f6f7; padding: 5px; margin-top: 10px; text-align: center; font-size: 12px; page-break-inside: avoid; }
             .pdf-inv-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; background: #f4f6f7; padding: 5px; border: 1px solid #ddd; font-size: 10px; text-align: center; margin-top: 10px; page-break-inside: avoid; }
@@ -123,50 +119,25 @@
             .baja-item-pdf { border: 1px solid #eee; padding: 3px; text-align: center; background: #fafafa; }
             .baja-item-pdf strong { color: #333; font-size: 11px; }
             
-            /* DISEÑO FOTOS GRANDES (2 POR PAGINA) */
-            .pdf-evidence-section { 
-                page-break-before: always; 
-                margin-top: 20px; 
-                display: block; 
-            }
+            /* FOTOS VERTICALES (100% ANCHO, 1 ARRIBA 1 ABAJO) */
+            .pdf-evidence-section { page-break-before: always; margin-top: 20px; display: block; }
             .pdf-evidence-block { 
-                width: 100%; /* OCUPA TODO EL ANCHO */
-                height: 45vh; /* CASI MEDIA PAGINA DE ALTO */
+                width: 100%; /* ANCHO COMPLETO */
+                height: 45vh; /* MITAD DE PAGINA */
                 border: 2px solid #333; 
-                margin-bottom: 2vh; 
-                padding: 10px; 
+                margin-bottom: 10px; 
+                padding: 5px; 
                 box-sizing: border-box; 
-                page-break-inside: avoid; /* EVITA QUE SE CORTE */
+                page-break-inside: avoid; 
                 background: #fff;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: flex-start;
+                display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
             }
             .pdf-evidence-label { 
-                width: 100%; 
-                text-align: center; 
-                font-weight: bold; 
-                font-size: 16px; 
-                background: #eee; 
-                border-bottom: 2px solid #333; 
-                margin-bottom: 10px; 
-                padding: 5px 0;
-                text-transform: uppercase;
+                width: 100%; text-align: center; font-weight: bold; font-size: 14px; 
+                background: #eee; border-bottom: 2px solid #333; margin-bottom: 5px; padding: 2px 0;
             }
-            .pdf-image-container { 
-                flex: 1; 
-                width: 100%; 
-                display: flex; 
-                justify-content: center; 
-                align-items: center; 
-                overflow: hidden; 
-            }
-            .pdf-image-container img { 
-                max-width: 98%; 
-                max-height: 95%; 
-                object-fit: contain; /* SE ASEGURA QUE LA FOTO SE VEA COMPLETA */
-            }
+            .pdf-image-container { flex: 1; width: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+            .pdf-image-container img { max-width: 99%; max-height: 98%; object-fit: contain; }
 
             .pdf-signatures { display: flex; justify-content: space-between; margin-top: 30px; padding: 0 40px; page-break-inside: avoid; }
             .sign-line { border-top: 1px solid black; width: 40%; text-align: center; font-size: 12px; padding-top: 5px; }
@@ -303,9 +274,17 @@
                 <div><span class="lbl-small" style="color:orange;">(-)Recog</span><input type="number" id="inv-rec" placeholder="0" oninput="calc()"></div>
             </div>
             
+            <div style="background:#eafaf1; padding:10px; border:1px solid #d5f5e3; border-radius:5px; margin-top:10px;">
+                <label style="font-weight:bold; font-size:0.8em; color:#27ae60;">AGREGAR TARJETA NUEVA (RUTA)</label>
+                <div class="dynamic-row">
+                    <input type="text" id="quick-clave" placeholder="Clave (C-100)" style="flex:1;">
+                    <input type="text" id="quick-num" placeholder="# Numero" style="flex:1;">
+                    <button class="btn-add" onclick="quickAddCard()" style="flex:1; background:#2ecc71; color:white; border:none;">+ AGREGAR</button>
+                </div>
+            </div>
+
             <div id="btn-conciliacion-container" style="display:none; margin-top:10px;">
                 <button class="btn-danger" style="animation: pulse 1s infinite;" onclick="openConciliacion()">⚠️ ELIMINAR <span id="count-to-delete">0</span> TARJETAS DE LA BASE</button>
-                <style>@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }</style>
             </div>
 
             <label style="font-weight:bold; color:var(--secondary); display:block; margin-top:10px;">CONTEO FÍSICO ACTUAL</label>
@@ -395,6 +374,9 @@
     <div class="pdf-title" style="margin-top:20px;">V. DETALLE DE TARJETAS RETIRADAS</div>
     <div id="p-grid-bajas" class="pdf-compact-grid"></div>
 
+    <div class="pdf-title" style="margin-top:20px;">VI. TARJETAS NUEVAS INGRESADAS</div>
+    <div id="p-grid-nuevas" class="pdf-compact-grid"></div>
+
     <div class="pdf-evidence-section"><div id="p-gal-mixed"></div></div>
     <div class="pdf-signatures"><div class="sign-line">Firma Cobrador</div><div class="sign-line">Firma Recibido</div></div>
 </div>
@@ -414,6 +396,7 @@
     let chartInst = null, adminChartInst = null;
     let chartEff = null, chartMon = null;
     let allCardsCache = []; 
+    let sessionNewCards = []; // Para guardar las nuevas de esta sesión
 
     window.addEventListener('load', async () => {
         const zBox = document.getElementById('zones-checkboxes');
@@ -487,6 +470,37 @@
         });
     }
 
+    // --- NUEVA FUNCION: AGREGAR TARJETA RAPIDO DESDE LIQUIDACION ---
+    window.quickAddCard = async () => {
+        const k = document.getElementById('quick-clave').value.trim();
+        const n = document.getElementById('quick-num').value.trim();
+        const z = document.getElementById('zonaSelect').value;
+        if(!k || !n) return alert("⚠️ Ingresa Clave y Número");
+        
+        // Verificar si existe en cache para no ir a DB
+        if(allCardsCache.some(c => c.clave === k)) return alert("⚠️ Esa tarjeta ya existe en la base.");
+
+        try {
+            await addDoc(collection(db, "tarjetas_fisicas"), { zona: z, clave: k, numero: n });
+            await registrarLog(z, k, n, 'NUEVA - LIQUIDACION');
+            
+            // Agregar a lista de sesión para PDF
+            sessionNewCards.push({clave: k, numero: n});
+            
+            alert("✅ Tarjeta Agregada Exitosamente");
+            document.getElementById('quick-clave').value = "";
+            document.getElementById('quick-num').value = "";
+            
+            // Actualizar datos
+            cargarDatos();
+            // Actualizar contador visual de Nuevas
+            let currentNew = parseInt(document.getElementById('inv-new').value) || 0;
+            document.getElementById('inv-new').value = currentNew + 1;
+            calc();
+            
+        } catch(e) { alert("Error guardando: " + e.message); }
+    };
+
     // --- BASE DE DATOS ---
     window.guardarTarjetaManual = async () => {
         const k = document.getElementById('manual-clave').value.trim();
@@ -516,10 +530,7 @@
     // ELIMINAR MANUAL (DESDE BASE DE DATOS)
     window.delRow = async (id) => {
         if(!confirm("¿Eliminar permanentemente?")) return;
-        
-        // Buscar info antes de borrar para el log
         const card = allCardsCache.find(c => c.id === id);
-        
         document.getElementById(`tr-${id}`).remove(); 
         try { 
             await deleteDoc(doc(db, "tarjetas_fisicas", id)); 
@@ -533,16 +544,11 @@
     window.borrarTodaLaZona = async () => {
         const z = document.getElementById('zonaSelect').value;
         if(!confirm(`⚠️ PELIGRO ⚠️\n\n¿BORRAR TODAS las tarjetas de ${z}?`)) return;
-        
         const showLoading = document.getElementById('loading-overlay');
         showLoading.style.display = 'flex';
-
         const q = query(collection(db, "tarjetas_fisicas"), where("zona", "==", z));
         const snap = await getDocs(q);
-        
         if(snap.empty) { showLoading.style.display = 'none'; return alert("No hay tarjetas para borrar."); }
-        
-        // CHUNK DELETION TO AVOID LIMITS
         const chunks = [];
         let batch = writeBatch(db);
         let count = 0;
@@ -556,10 +562,8 @@
             }
         });
         if(count > 0) chunks.push(batch.commit());
-        
         await Promise.all(chunks);
         await registrarLog(z, 'TODAS', 'TODAS', 'ELIMINACIÓN MASIVA ZONA');
-        
         showLoading.style.display = 'none';
         alert(`✅ Eliminadas ${snap.size} tarjetas.`);
         cargarDatos();
@@ -568,27 +572,19 @@
     window.eliminarDuplicadosZona = async () => {
         const z = document.getElementById('zonaSelect').value;
         if(!confirm(`¿Buscar y eliminar duplicados en ${z}?`)) return;
-        
         const showLoading = document.getElementById('loading-overlay');
         showLoading.style.display = 'flex';
-
         const q = query(collection(db, "tarjetas_fisicas"), where("zona", "==", z));
         const snap = await getDocs(q);
-        
         if(snap.empty) { showLoading.style.display = 'none'; return alert("Zona vacía."); }
-
         let seen = new Set();
         let duplicates = [];
-        
         snap.forEach(doc => {
             const key = doc.data().clave.trim(); 
             if (seen.has(key)) duplicates.push(doc.ref);
             else seen.add(key);
         });
-
         if(duplicates.length === 0) { showLoading.style.display = 'none'; return alert("✅ No se encontraron duplicados."); }
-        
-        // Batch Delete Duplicates
         const chunks = [];
         let batch = writeBatch(db);
         let count = 0;
@@ -602,7 +598,6 @@
             }
         });
         if(count > 0) chunks.push(batch.commit());
-        
         await Promise.all(chunks);
         showLoading.style.display = 'none';
         alert(`✅ Se eliminaron ${duplicates.length} duplicados.`);
@@ -614,13 +609,10 @@
         const q = query(collection(db,"tarjetas_fisicas"), where("zona","==",z));
         const snap = await getDocs(q);
         totalSys = snap.size; 
-        
         allCardsCache = [];
         snap.forEach(d => { allCardsCache.push({ id: d.id, ...d.data() }); });
-
         if(document.getElementById('total-sys')) document.getElementById('total-sys').innerText=totalSys;
         if(document.getElementById('db-total-count')) document.getElementById('db-total-count').innerText=totalSys;
-        
         if(currentUser.role==='admin') {
             const tbody = document.getElementById('db-body'); tbody.innerHTML="";
             allCardsCache.forEach(d => {
@@ -670,24 +662,17 @@
         if(!confirm(`¿Marcar como ${reason}?`)) return;
         const row = document.getElementById(`modal-tr-${id}`);
         row.style.opacity = '0.5';
-        
         try {
-            // Log first
             const card = allCardsCache.find(c => c.id === id);
             if(card) await registrarLog(card.zona, card.clave, card.numero, reason);
-
             await deleteDoc(doc(db, "tarjetas_fisicas", id));
             allCardsCache = allCardsCache.filter(c => c.id !== id);
             row.remove();
-            
             toDeleteCount--; totalSys--;
             document.getElementById('cards-to-delete-count').innerText = toDeleteCount;
             document.getElementById('total-sys').innerText = totalSys;
-            
-            // Sync with main table if loaded
             const mainRow = document.getElementById(`tr-${id}`);
             if(mainRow) mainRow.remove();
-
             if(toDeleteCount <= 0) { alert("✅ ¡Conciliación Completada!"); closeConciliacion(); calc(); }
         } catch(e) { alert("Error: " + e.message); row.style.opacity = '1'; }
     }
@@ -698,19 +683,15 @@
         const z = document.getElementById('zonaSelect').value;
         const q = query(collection(db, "historial_tarjetas"), where("zona", "==", z));
         const snap = await getDocs(q);
-        
         let logs = [];
         snap.forEach(doc => logs.push(doc.data()));
-        // Ordenar en JS para evitar bloqueo de indice
         logs.sort((a,b) => b.fecha.seconds - a.fecha.seconds);
-        
         const tbody = document.getElementById('history-table-body'); tbody.innerHTML = "";
         logs.forEach(d => {
             let color = 'black';
-            if(d.accion === 'NUEVA') color = 'green';
+            if(d.accion.includes('NUEVA')) color = 'green';
             if(d.accion === 'CANCELADA') color = 'red';
             if(d.accion === 'RECOGIDA') color = 'orange';
-            
             tbody.innerHTML += `<tr>
                 <td>${d.fecha.toDate().toLocaleString()}</td>
                 <td>${d.clave} - ${d.numero}</td>
@@ -731,6 +712,7 @@
     
     document.getElementById('zonaSelect').addEventListener('change', ()=>{ 
         const activeView = document.querySelector('.view-section.active').id;
+        sessionNewCards = []; // Limpiar lista de nuevas al cambiar zona
         if(currentUser.role==='cobrador') cargarDash(); 
         else if (activeView === 'view-stats') loadAdminStats();
         else cargarDatos(); 
@@ -798,7 +780,7 @@
 
     ['inv-new','inv-baj','inv-rec','inv-fis'].forEach(id=>{if(document.getElementById(id)) document.getElementById(id).addEventListener('input',calc)});
 
-    // --- VISTA PREVIA (AUTO-BAJAS + FOTOS GRANDES) ---
+    // --- VISTA PREVIA (AUTO-BAJAS + FOTOS GRANDES + NUEVAS) ---
     window.abrirVistaPrevia = async () => {
         const c = calc();
         document.getElementById('p-zona').innerText = document.getElementById('zonaSelect').value;
@@ -822,7 +804,7 @@
         document.getElementById('p-tot').innerText = totalSys;
         document.getElementById('p-nocob').innerText = (totalSys - c.cobradas);
 
-        // GRID COMPACTO DE BAJAS
+        // GRID BAJAS
         const z = document.getElementById('zonaSelect').value;
         const qH = query(collection(db, "historial_tarjetas"), where("zona", "==", z));
         const sH = await getDocs(qH);
@@ -834,6 +816,10 @@
         const gridBajas = document.getElementById('p-grid-bajas'); gridBajas.innerHTML = "";
         if(bajas.length > 0) { bajas.forEach(b => { gridBajas.innerHTML += `<div class="baja-item-pdf"><strong>#${b.numero}</strong><br>${b.accion.substring(0,4)}<button class="btn-remove-pdf" onclick="this.parentElement.remove()">X</button></div>`; }); } else { gridBajas.innerHTML = `<div style="grid-column: span 4; text-align:center;">- Ninguna -</div>`; }
 
+        // GRID NUEVAS (De esta sesion)
+        const gridNuevas = document.getElementById('p-grid-nuevas'); gridNuevas.innerHTML = "";
+        if(sessionNewCards.length > 0) { sessionNewCards.forEach(b => { gridNuevas.innerHTML += `<div class="baja-item-pdf"><strong>#${b.numero}</strong><br>NUEVA</div>`; }); } else { gridNuevas.innerHTML = `<div style="grid-column: span 4; text-align:center;">- Ninguna -</div>`; }
+
         let nw=parseInt(document.getElementById('inv-new').value)||0, baj=parseInt(document.getElementById('inv-baj').value)||0, rec=parseInt(document.getElementById('inv-rec').value)||0, fi=document.getElementById('inv-fis').value;
         let teo = totalSys + nw - baj - rec;
         document.getElementById('p-sys').innerText=totalSys; document.getElementById('p-new').innerText=nw; document.getElementById('p-baj').innerText=baj; document.getElementById('p-recog').innerText=rec;
@@ -844,22 +830,12 @@
         const pGal = document.getElementById('p-gal-mixed'); 
         pGal.innerHTML="";
         
-        // Agregar fotos de Gastos
         document.querySelectorAll('#gal-gas img').forEach(i=>{ 
-            pGal.innerHTML+=`
-            <div class="pdf-evidence-block">
-                <div class="pdf-evidence-label">GASTO OPERATIVO</div>
-                <div class="pdf-image-container"><img src="${i.src}"></div>
-            </div>`; 
+            pGal.innerHTML+=`<div class="pdf-evidence-block"><div class="pdf-evidence-label">GASTO OPERATIVO</div><div class="pdf-image-container"><img src="${i.src}"></div></div>`; 
         });
         
-        // Agregar fotos de Banco
         document.querySelectorAll('#gal-ban img').forEach(i=>{ 
-            pGal.innerHTML+=`
-            <div class="pdf-evidence-block">
-                <div class="pdf-evidence-label">VOUCHER BANCO</div>
-                <div class="pdf-image-container"><img src="${i.src}"></div>
-            </div>`; 
+            pGal.innerHTML+=`<div class="pdf-evidence-block"><div class="pdf-evidence-label">VOUCHER BANCO</div><div class="pdf-image-container"><img src="${i.src}"></div></div>`; 
         });
 
         document.getElementById('app-container').style.display = 'none';
@@ -927,56 +903,25 @@
     window.crearUsuario = async () => { const u=document.getElementById('new-user').value, p=document.getElementById('new-pass').value, r=document.getElementById('new-role').value; let z=[]; document.querySelectorAll('#zones-checkboxes input:checked').forEach(c=>z.push(c.value)); if(!u || !p) return alert("Faltan datos"); await addDoc(collection(db, "usuarios"), { username:u, password:p, role:r, zones:z }); alert("Creado"); loadUsers(); };
     async function loadUsers(){ const s=await getDocs(collection(db,"usuarios")); let h=""; s.forEach(d=>h+=`<div>${d.data().username} <button onclick="delUser('${d.id}')">X</button></div>`); document.getElementById('lista-usuarios').innerHTML=h; }
     window.delUser=async(id)=>{ if(confirm("Borrar?")) await deleteDoc(doc(db,"usuarios",id)); loadUsers(); };
-    
-    // --- ESTADISTICAS CLIENTE-SIDE (CORREGIDO PARA FIREBASE SIN INDICE) ---
     window.loadAdminStats = async () => { 
         const z = document.getElementById('zonaSelect').value; 
         document.getElementById('stat-zona-title').innerText = z; 
-        
-        // 1. Descargar TODO de esa zona (sin ordenar en la nube para no pedir índice)
         const q = query(collection(db, "historial_cortes"), where("zona", "==", z)); 
         const snap = await getDocs(q); 
-        
         let docsArray = [];
-        snap.forEach(doc => {
-            docsArray.push({ id: doc.id, ...doc.data() }); 
-        });
-
-        // 2. Ordenar AQUÍ en el navegador (Javascript) por fecha
+        snap.forEach(doc => { docsArray.push({ id: doc.id, ...doc.data() }); });
         docsArray.sort((a, b) => a.fecha.seconds - b.fecha.seconds);
-
-        // 3. Pintar la tabla
         let l=[], d=[], tHTML=""; 
         docsArray.forEach(data => { 
             const date = data.fecha.toDate().toLocaleDateString('es-HN'); 
-            l.push(date); 
-            d.push(data.recaudado); 
-            tHTML += `<tr>
-                <td>${date}</td>
-                <td>${data.semana||'-'}</td>
-                <td>L. ${data.recaudado}</td>
-                <td>L. ${data.comision}</td>
-                <td><button class="btn-del-row" onclick="deleteStat('${data.id}')">🗑️</button></td>
-            </tr>`; 
+            l.push(date); d.push(data.recaudado); 
+            tHTML += `<tr><td>${date}</td><td>${data.semana||'-'}</td><td>L. ${data.recaudado}</td><td>L. ${data.comision}</td><td><button class="btn-del-row" onclick="deleteStat('${data.id}')">🗑️</button></td></tr>`; 
         }); 
-        
         document.getElementById('admin-stats-body').innerHTML = tHTML; 
         if(adminChartInst) adminChartInst.destroy(); 
         adminChartInst = new Chart(document.getElementById('adminChart'), { type:'line', data:{labels:l, datasets:[{label:'Tendencia Recaudo', data:d, borderColor:'#e74c3c', tension:0.3}]} }); 
     }
-
-    // --- BORRAR ESTADISTICA ---
-    window.deleteStat = async (id) => {
-        if(!confirm("¿Eliminar este registro de historial permanentemente?")) return;
-        try {
-            await deleteDoc(doc(db, "historial_cortes", id));
-            alert("Registro eliminado");
-            loadAdminStats(); // Reload table
-        } catch (e) {
-            alert("Error al borrar: " + e.message);
-        }
-    }
-
+    window.deleteStat = async (id) => { if(!confirm("¿Eliminar?")) return; try { await deleteDoc(doc(db, "historial_cortes", id)); alert("Eliminado"); loadAdminStats(); } catch (e) { alert("Error: " + e.message); } }
     window.cargarDash = async () => { const z = document.getElementById('zonaSelect').value; const dStart = document.getElementById('dash-start').value; const dEnd = document.getElementById('dash-end').value; document.getElementById('dash-zona').innerText = z; document.getElementById('dash-name').innerText = currentUser.username; const qT = query(collection(db, "tarjetas_fisicas"), where("zona", "==", z)); const sT = await getDocs(qT); const currentRouteCards = sT.size; const start = new Date(dStart + "T00:00:00"); const end = new Date(dEnd + "T23:59:59"); const qH = query(collection(db, "historial_cortes"), where("zona", "==", z)); const sH = await getDocs(qH); let docs = []; sH.forEach(doc => docs.push(doc.data())); docs = docs.filter(d => d.fecha.toDate() >= start && d.fecha.toDate() <= end); docs.sort((a,b) => a.fecha.seconds - b.fecha.seconds); let dates=[], recaudos=[], comisiones=[], totRec=0, totCom=0, totCob=0; let tHTML = ""; docs.forEach(dt=>{ const dateStr = dt.fecha.toDate().toLocaleDateString('es-HN',{day:'numeric',month:'short'}); dates.push(dateStr); recaudos.push(dt.recaudado); comisiones.push(dt.comision); totRec+=dt.recaudado||0; totCom+=dt.comision||0; totCob+=dt.tarjetas_cobradas||0; tHTML += `<tr><td>${dateStr}</td><td>${dt.tarjetas_cobradas||0}</td><td>L. ${dt.recaudado.toLocaleString()}</td><td>L. ${dt.comision.toLocaleString()}</td></tr>`; }); document.getElementById('kpi-recaudo').innerText="L. "+totRec.toLocaleString(); document.getElementById('kpi-com').innerText="L. "+totCom.toLocaleString(); document.getElementById('kpi-cobradas').innerText = `${totCob} / ${currentRouteCards}`; document.getElementById('dash-history-body').innerHTML = tHTML; if(chartEff) chartEff.destroy(); const pending = currentRouteCards - totCob; const efficiencyPercent = currentRouteCards > 0 ? Math.round((totCob/currentRouteCards)*100) : 0; document.getElementById('chart-center-val').innerText = efficiencyPercent + "%"; chartEff = new Chart(document.getElementById('chartEfficiency'), { type: 'doughnut', data: { labels: ['Cobradas', 'Pendientes'], datasets: [{ data: [totCob, (pending > 0 ? pending : 0)], backgroundColor: ['#27ae60', '#ecf0f1'], borderWidth: 0 }] }, options: { cutout: '70%', plugins: { legend: { display: false } } } }); if(chartMon) chartMon.destroy(); chartMon = new Chart(document.getElementById('chartMoney'), { type: 'bar', data: { labels: dates, datasets: [ { label: 'Recaudado', data: recaudos, backgroundColor: '#2980b9' }, { label: 'Comisión', data: comisiones, backgroundColor: '#f39c12' } ] }, options: { scales: { y: { beginAtZero: true } } } }); }
 </script>
 </body>
