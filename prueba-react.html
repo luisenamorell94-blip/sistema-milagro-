@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Milagro (React Version)</title>
+    
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 400px; margin: 0 auto 20px auto; text-align: center; }
+        .btn { background: #2c3e50; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 10px; width: 100%; }
+        .btn:hover { background: #34495e; }
+        .input-box { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        .tarjeta-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
+        .badge { background: #27ae60; color: white; padding: 2px 8px; border-radius: 10px; font-size: 12px; }
+        .cm-logo { font-size: 2em; font-weight: 900; color: #2c3e50; border: 3px solid #2c3e50; padding: 5px; border-radius: 8px; display: inline-block; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        // --- COMPONENTE 1: PANTALLA DE LOGIN ---
+        function LoginScreen({ alEntrar }) {
+            const [user, setUser] = useState("");
+            const [pass, setPass] = useState("");
+
+            const intentarEntrar = () => {
+                if(pass === "2026") {
+                    alEntrar(user); // Avisamos al sistema que entramos
+                } else {
+                    alert("Contraseña incorrecta (Pista: 2026)");
+                }
+            };
+
+            return (
+                <div className="card">
+                    <div className="cm-logo">CM</div>
+                    <h2>Comercial Milagro</h2>
+                    <input className="input-box" placeholder="Usuario" onChange={e => setUser(e.target.value)} />
+                    <input className="input-box" type="password" placeholder="Contraseña" onChange={e => setPass(e.target.value)} />
+                    <button className="btn" onClick={intentarEntrar}>ENTRAR (React)</button>
+                </div>
+            );
+        }
+
+        // --- COMPONENTE 2: TARJETA INDIVIDUAL (LA PIEZA DE LEGO) ---
+        function TarjetaRow({ clave, numero, onBorrar }) {
+            return (
+                <div className="tarjeta-row">
+                    <span>💳 <b>{clave}</b></span>
+                    <span>#{numero}</span>
+                    <button style={{background:'red', border:'none', color:'white', borderRadius:'5px'}} onClick={onBorrar}>X</button>
+                </div>
+            );
+        }
+
+        // --- COMPONENTE 3: PANEL PRINCIPAL ---
+        function Dashboard({ usuario, cerrarSesion }) {
+            // "Estado" es la memoria del componente
+            const [tarjetas, setTarjetas] = useState([
+                { id: 1, clave: "C-101", numero: "500" },
+                { id: 2, clave: "C-102", numero: "501" }
+            ]);
+            const [nuevaClave, setNuevaClave] = useState("");
+
+            const agregar = () => {
+                const nueva = { id: Date.now(), clave: nuevaClave, numero: "000" };
+                setTarjetas([...tarjetas, nueva]); // Agrega a la lista sin borrar lo anterior
+                setNuevaClave("");
+            };
+
+            const borrar = (id) => {
+                setTarjetas(tarjetas.filter(t => t.id !== id));
+            };
+
+            return (
+                <div className="container">
+                    <div className="card" style={{maxWidth:'600px'}}>
+                        <h3>Hola, {usuario} 👋</h3>
+                        <p>Sistema construido con <b>React.js</b></p>
+                        
+                        <div style={{background:'#f9f9f9', padding:'10px', marginBottom:'10px'}}>
+                            <input 
+                                className="input-box" 
+                                value={nuevaClave} 
+                                placeholder="Nueva Clave (ej: C-999)" 
+                                onChange={e => setNuevaClave(e.target.value)} 
+                            />
+                            <button className="btn" style={{background:'#27ae60'}} onClick={agregar}>+ AGREGAR TARJETA</button>
+                        </div>
+
+                        <h4>Inventario ({tarjetas.length})</h4>
+                        <div>
+                            {tarjetas.map(t => (
+                                <TarjetaRow 
+                                    key={t.id} 
+                                    clave={t.clave} 
+                                    numero={t.numero} 
+                                    onBorrar={() => borrar(t.id)} 
+                                />
+                            ))}
+                        </div>
+
+                        <button className="btn" style={{marginTop:'20px', background:'#e74c3c'}} onClick={cerrarSesion}>Cerrar Sesión</button>
+                    </div>
+                </div>
+            );
+        }
+
+        // --- COMPONENTE MAESTRO (APP) ---
+        function App() {
+            const [usuarioActual, setUsuarioActual] = useState(null);
+
+            return (
+                <div>
+                    {usuarioActual ? (
+                        <Dashboard 
+                            usuario={usuarioActual} 
+                            cerrarSesion={() => setUsuarioActual(null)} 
+                        />
+                    ) : (
+                        <LoginScreen alEntrar={(u) => setUsuarioActual(u)} />
+                    )}
+                </div>
+            );
+        }
+
+        // ENCENDEMOS LA APP
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
