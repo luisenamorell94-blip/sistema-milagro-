@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sistema Milagro | v45 Final</title>
+    <title>Sistema Milagro | v47 Final</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -26,7 +26,6 @@
         .login-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; font-size: 16px; text-align: center; color: #333; background: #f9f9f9; }
         .login-btn { background: var(--blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 20px; transition: background 0.3s; }
         
-        /* HEADER & TABS */
         header { background: linear-gradient(135deg, #1a252f 0%, #2c3e50 100%); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
         .card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; }
         .tabs { display: flex; gap: 5px; margin-bottom: 15px; overflow-x: auto; }
@@ -37,8 +36,10 @@
         .view-section.active { display: block; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* ESTILOS DE RUTA (NUEVO) */
-        .ruta-list { max-height: 60vh; overflow-y: auto; border: 1px solid #eee; border-radius: 5px; }
+        /* RUTA STYLES */
+        .ruta-header-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .ruta-counter { background: var(--route); color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; }
+        .ruta-list { max-height: 60vh; overflow-y: auto; border: 1px solid #eee; border-radius: 5px; background: #f9f9f9; }
         .ruta-item { padding: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; background: #fff; }
         .ruta-info h4 { margin: 0; font-size: 1.1em; color: #333; }
         .ruta-badge { padding: 4px 8px; border-radius: 12px; font-size: 0.75em; font-weight: bold; display: inline-block; margin-top: 5px; }
@@ -47,7 +48,7 @@
         .bg-wait { background: #fcf3cf; color: #f39c12; }
         .btn-pay { background: var(--blue); color: white; border: none; padding: 8px 15px; border-radius: 20px; font-weight: bold; cursor: pointer; }
 
-        /* ESTILOS LIQUIDACION */
+        /* GENERAL INPUTS */
         .item-container { border: 1px solid #eee; background: #fafafa; padding: 8px; margin-bottom: 8px; border-radius: 6px; }
         .dynamic-row { display: flex; gap: 5px; margin-bottom: 5px; }
         input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 0.9em; }
@@ -56,9 +57,11 @@
         .btn-del { background: #e74c3c; color: white; border: none; border-radius: 4px; padding: 5px 15px; font-weight: bold; cursor: pointer; }
         .btn-main { background: var(--primary); color: white; border: none; padding: 15px; width: 100%; border-radius: 6px; font-weight: bold; font-size: 16px; margin-top: 10px; cursor: pointer; }
         .btn-clear { background: #7f8c8d; color: white; border: none; padding: 15px; width: 100%; border-radius: 6px; font-weight: bold; font-size: 16px; margin-top: 10px; cursor: pointer; }
-        .btn-danger { background: var(--alert); color: white; border: none; padding: 15px; width: 100%; border-radius: 6px; font-weight: bold; font-size: 16px; margin-top: 10px; cursor: pointer; }
+        .btn-danger { background: var(--alert); color: white; border: none; padding: 15px; width: 100%; border-radius: 6px; font-weight: bold; font-size: 16px; margin-top: 10px; cursor: pointer; animation: pulse 1.5s infinite; }
         .btn-del-row { background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.8em; }
         .btn-remove-pdf { background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-weight: bold; font-size: 10px; margin-left: 5px; }
+        
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); box-shadow: 0 0 10px rgba(192, 57, 43, 0.5); } 100% { transform: scale(1); } }
 
         .money-card { border-left: 5px solid var(--money); background: #f4fbf9; }
         .money-result { font-size: 1.8em; font-weight: bold; color: var(--money); display:block; text-align:right; }
@@ -75,22 +78,14 @@
         
         .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .chart-box { background: white; padding: 10px; border-radius: 8px; border: 1px solid #eee; height: 220px; display: flex; justify-content: center; align-items: center; position: relative; }
-        
         .data-table { width: 100%; border-collapse: collapse; font-size: 0.85em; margin-top: 10px; }
         .data-table th { background: #ecf0f1; padding: 8px; text-align: left; border-bottom: 2px solid #bdc3c7; }
         .data-table td { padding: 8px; border-bottom: 1px solid #eee; vertical-align: middle; }
-
-        .kpi-row { display: flex; justify-content: space-between; margin-bottom: 15px; gap: 10px; }
-        .kpi-card { flex: 1; padding: 15px; border-radius: 8px; color: white; text-align: center; }
-        .kpi-card.green { background: linear-gradient(135deg, #2ecc71, #27ae60); }
-        .kpi-card.blue { background: linear-gradient(135deg, #3498db, #2980b9); }
-        .kpi-card strong { font-size: 1.4em; display: block; }
 
         .zones-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin: 10px 0; text-align: left; max-height: 150px; overflow-y: auto; background: #fff; border: 1px solid #ddd; padding: 5px; }
         .zone-check { display: flex; align-items: center; font-size: 0.85em; padding: 5px; border-bottom: 1px solid #eee; }
         .user-item { display: flex; justify-content: space-between; background: #fff; padding: 10px; border-bottom: 1px solid #eee; align-items: center; }
 
-        /* MODALES */
         .modal-overlay { display: none; position: fixed; z-index: 20000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); align-items: center; justify-content: center; }
         .modal-content { background-color: #fff; padding: 20px; width: 90%; max-width: 500px; border-radius: 10px; position: relative; box-shadow: 0 5px 25px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; }
         .modal-header { font-weight: bold; font-size: 1.2em; margin-bottom: 15px; color: #2c3e50; text-align: center; border-bottom: 2px solid #eee; padding-bottom: 10px; }
@@ -100,7 +95,6 @@
         #loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); z-index: 30000; justify-content: center; align-items: center; flex-direction: column; }
         .spinner { border: 8px solid #f3f3f3; border-top: 8px solid #3498db; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
         #restore-msg { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: #2ecc71; color: white; padding: 10px 20px; border-radius: 30px; font-weight: bold; z-index: 9001; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
 
         /* IMPRESIÓN */
@@ -129,7 +123,6 @@
             .baja-item-pdf { border: 1px solid #eee; padding: 3px; text-align: center; background: #fafafa; }
             .baja-item-pdf strong { color: #333; font-size: 11px; }
             
-            /* FOTOS VERTICALES GRANDES */
             .pdf-evidence-section { page-break-before: always; margin-top: 20px; display: block; }
             .pdf-evidence-block { width: 100%; height: 45vh; border: 2px solid #333; margin-bottom: 10px; padding: 5px; box-sizing: border-box; page-break-inside: avoid; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
             .pdf-evidence-label { width: 100%; text-align: center; font-weight: bold; font-size: 14px; background: #eee; border-bottom: 2px solid #333; margin-bottom: 5px; padding: 2px 0; text-transform: uppercase; }
@@ -220,7 +213,8 @@
 
     <div class="tabs" id="tabs-admin">
         <button class="tab-btn active" onclick="nav('cuadre')">📝 Liquidación</button>
-        <button class="tab-btn" onclick="nav('ruta')" style="color:var(--route);">🚚 COBROS (Ruta)</button> <button class="tab-btn" onclick="nav('stats')">📊 Estadísticas</button>
+        <button class="tab-btn" onclick="nav('ruta')" style="color:var(--route);">🚚 COBROS</button>
+        <button class="tab-btn" onclick="nav('stats')">📊 Estadísticas</button>
         <button class="tab-btn" onclick="nav('usuarios')">👥 Usuarios</button>
         <button class="tab-btn" onclick="nav('base')">🗃️ Base Datos</button>
     </div>
@@ -302,12 +296,14 @@
 
     <div id="view-ruta" class="view-section">
         <div class="card" style="border-left: 5px solid var(--route);">
-            <h3>🚚 COBROS EN RUTA</h3>
-            <p>Lista de tarjetas de: <strong id="ruta-zona-display">...</strong></p>
+            <div class="ruta-header-info">
+                <h3>🚚 COBROS EN RUTA</h3>
+                <span id="ruta-total-cards" class="ruta-counter">Total: 0</span>
+            </div>
+            <p>Lista de: <strong id="ruta-zona-display">...</strong></p>
             <input type="text" id="search-ruta" placeholder="Buscar Tarjeta..." onkeyup="filtrarRuta()" style="margin-bottom:10px;">
             <div id="lista-ruta-container" class="ruta-list">
-                <div style="padding:20px; text-align:center; color:#7f8c8d;">Selecciona una Zona arriba para ver tarjetas</div>
-            </div>
+                </div>
         </div>
     </div>
 
@@ -413,6 +409,7 @@
     let allCardsCache = []; 
     let sessionNewCards = [];
     let currentPayId = null;
+    let rutaCards = [];
 
     window.addEventListener('load', async () => {
         const zBox = document.getElementById('zones-checkboxes');
@@ -425,125 +422,11 @@
         document.getElementById('dash-start').value = firstDay.toISOString().split('T')[0];
         document.getElementById('dash-end').value = now.toISOString().split('T')[0];
         
-        // AUTO-CARGAR BORRADOR (ANTI-OLVIDO)
         setTimeout(cargarBorrador, 1000);
         document.body.addEventListener('input', guardarBorrador);
         document.body.addEventListener('change', guardarBorrador);
     });
 
-    // --- FUNCIONES NUEVA PESTAÑA COBROS (RUTA) CORREGIDAS ---
-    window.cargarRuta = async () => {
-        const z = document.getElementById('zonaSelect').value;
-        const list = document.getElementById('lista-ruta-container');
-        document.getElementById('ruta-zona-display').innerText = z;
-        
-        if(!z || z === 'Sin Zona Asignada') {
-            list.innerHTML = "<div style='padding:20px; text-align:center;'>Seleccione una Zona primero.</div>";
-            return;
-        }
-
-        const showLoading = document.getElementById('loading-overlay');
-        showLoading.style.display = 'flex';
-        
-        try {
-            const q = query(collection(db, "tarjetas_fisicas"), where("zona", "==", z));
-            const snap = await getDocs(q);
-            
-            let rutaCards = [];
-            snap.forEach(d => rutaCards.push({ id: d.id, ...d.data() }));
-            rutaCards.sort((a,b) => a.clave.localeCompare(b.clave));
-
-            list.innerHTML = "";
-            if(rutaCards.length === 0) {
-                list.innerHTML = "<div style='padding:20px; text-align:center;'>No hay tarjetas en esta zona.</div>";
-            }
-
-            rutaCards.forEach(c => {
-                let statusHTML = `<span class="ruta-badge bg-wait">⚠️ Sin Historial</span>`;
-                let diffDays = 0;
-
-                if(c.ultimo_pago) {
-                    const last = c.ultimo_pago.toDate();
-                    const now = new Date();
-                    const diffTime = Math.abs(now - last);
-                    diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-
-                    if(diffDays <= 8) {
-                        statusHTML = `<span class="ruta-badge bg-ok">🟢 Al Día (${diffDays}d)</span>`;
-                    } else {
-                        const weeks = Math.floor(diffDays / 7);
-                        statusHTML = `<span class="ruta-badge bg-late">🔴 Mora: ${weeks} Sem.</span>`;
-                    }
-                }
-
-                list.innerHTML += `
-                <div class="ruta-item" id="card-${c.id}">
-                    <div class="ruta-info">
-                        <h4>${c.clave} - #${c.numero}</h4>
-                        ${statusHTML}
-                    </div>
-                    <button class="btn-pay" onclick="openAbono('${c.id}', '${c.clave}', '${c.numero}')">💰 ABONAR</button>
-                </div>`;
-            });
-        } catch(e) {
-            console.error(e);
-            list.innerHTML = "<div style='padding:20px; color:red;'>Error cargando ruta.</div>";
-        }
-        showLoading.style.display = 'none';
-    };
-
-    window.openAbono = (id, clave, num) => {
-        document.getElementById('abonoModal').style.display = 'flex';
-        document.getElementById('abono-info').innerText = `${clave} - #${num}`;
-        document.getElementById('abono-info').dataset.id = id; 
-        document.getElementById('abono-monto').focus();
-    };
-
-    window.closeAbono = () => {
-        document.getElementById('abonoModal').style.display = 'none';
-        document.getElementById('abono-recibo').value = "";
-        document.getElementById('abono-monto').value = "";
-    };
-
-    window.confirmarAbono = async () => {
-        const id = document.getElementById('abono-info').dataset.id;
-        const monto = document.getElementById('abono-monto').value;
-        const recibo = document.getElementById('abono-recibo').value;
-
-        if(!monto || !recibo) return alert("Faltan datos");
-
-        try {
-            // 1. Actualizar fecha en la tarjeta
-            await updateDoc(doc(db, "tarjetas_fisicas", id), {
-                ultimo_pago: new Date()
-            });
-
-            // 2. Guardar en historial
-            await addDoc(collection(db, "historial_tarjetas"), {
-                fecha: new Date(),
-                zona: document.getElementById('zonaSelect').value,
-                clave: document.getElementById('abono-info').innerText.split(' - ')[0],
-                numero: document.getElementById('abono-info').innerText.split(' - ')[1].replace('#',''),
-                accion: `PAGO: L.${monto} (Rec:${recibo})`,
-                usuario: currentUser.username
-            });
-
-            alert("✅ Pago registrado");
-            closeAbono();
-            cargarRuta(); // Refrescar lista para verla verde
-        } catch(e) {
-            alert("Error: " + e.message);
-        }
-    };
-
-    window.filtrarRuta = () => {
-        const q = document.getElementById('search-ruta').value.toLowerCase();
-        document.querySelectorAll('.ruta-item').forEach(el => {
-            el.style.display = el.innerText.toLowerCase().includes(q) ? 'flex' : 'none';
-        });
-    };
-
-    // --- FUNCIONES SISTEMA ORIGINAL ---
     window.guardarBorrador = () => {
         if(!currentUser || currentUser.role !== 'admin') return;
         document.querySelectorAll('input, select').forEach(i => {
@@ -623,6 +506,7 @@
         document.getElementById('user-display').innerText = user.username + (user.role==='admin'?' (Admin)':'');
 
         const sel = document.getElementById('zonaSelect'); sel.innerHTML="";
+        
         const allowedZones = user.role==='admin' ? ZONAS : (user.zones || []);
         if(allowedZones.length===0) sel.innerHTML="<option>Sin Zona Asignada</option>";
         else allowedZones.forEach(z => sel.innerHTML+=`<option value="${z}">${z}</option>`);
@@ -694,7 +578,7 @@
     window.addBan = () => { document.getElementById('lista-banco').insertAdjacentHTML('beforeend', `<div class="item-container item-ban"><div class="dynamic-row"><select class="b-banc" style="flex:1"><option>Atlántida</option><option>BAC</option><option>Occidente</option><option>Ficohsa</option><option>Banpais</option></select><select class="b-cta" style="flex:1"><option>Jose Rodinder Guardado</option><option>Angel David Guardado</option></select></div><div class="dynamic-row"><div style="flex:1"><span class="lbl-small">Ref/Voucher</span><input class="b-ref"></div><div style="flex:1"><span class="lbl-small">Fecha</span><input type="date" class="b-date"></div></div><div class="dynamic-row"><div style="flex:2"><span class="lbl-small">Monto L.</span><input type="number" class="monto-ban" oninput="calc()"></div><button class="btn-del" onclick="this.parentElement.parentElement.remove();calc()">X</button></div></div>`); };
     window.updRow = (el) => { const p = el.closest('.item-container'); let del=parseInt(p.querySelector('.tal-del').value)||0, al=parseInt(p.querySelector('.tal-al').value)||0; if(del>0 && al>=del) { p.querySelector('.row-inf').innerHTML = `Usados: <b>${al-del+1}</b>`; } calc(); };
     window.procPic = (inp, divId) => { if(inp.files.length) Array.from(inp.files).forEach(f=>{ let r=new FileReader(); r.onload=(e)=>{ document.getElementById(divId).innerHTML+=`<div class="thumb"><img src="${e.target.result}"><button class="thumb-x" onclick="this.parentElement.remove()">X</button></div>`; }; r.readAsDataURL(f); }); inp.value=''; };
-    window.calc = () => { let r=0, g=0, b=0, tarjetasCobradas=0; document.querySelectorAll('.item-container').forEach(el => { if(el.querySelector('.tal-del')) { let m = parseFloat(el.querySelector('.monto-tal').value)||0; r+=m; let d = parseInt(el.querySelector('.tal-del').value)||0, a = parseInt(el.querySelector('.tal-al').value)||0; if(a>=d) tarjetasCobradas += (a-d+1); } }); document.querySelectorAll('.monto-gas').forEach(i=>g+=parseFloat(i.value)||0); document.querySelectorAll('.monto-ban').forEach(i=>b+=parseFloat(i.value)||0); let c = r * 0.10; let n = r - c - g - b; ['lbl_tal','res_ing'].forEach(id=>document.getElementById(id).innerText="L. "+r.toFixed(2)); ['lbl_gas','res_gas'].forEach(id=>document.getElementById(id).innerText="L. "+g.toFixed(2)); ['lbl_ban','res_ban'].forEach(id=>document.getElementById(id).innerText="L. "+b.toFixed(2)); document.getElementById('res_com').innerText="L. "+c.toFixed(2); ['res_neto'].forEach(id=>document.getElementById(id).innerText="L. "+n.toFixed(2)); if(totalSys > 0) { let eff = Math.round((tarjetasCobradas / totalSys) * 100); document.getElementById('eff-text').innerText = `Cobraste ${tarjetasCobradas} de ${totalSys} (${eff}%)`; document.getElementById('eff-bar').style.width = eff + "%"; document.getElementById('eff-bar').style.background = eff < 50 ? "#c0392b" : (eff < 80 ? "#f39c12" : "#27ae60"); } if(document.getElementById('inv-fis')) { let nw=parseInt(document.getElementById('inv-new').value)||0, bj=parseInt(document.getElementById('inv-baj').value)||0, rec=parseInt(document.getElementById('inv-rec').value)||0, fi=document.getElementById('inv-fis').value; toDeleteCount = bj + rec; const btnContainer = document.getElementById('btn-conciliacion-container'); if(toDeleteCount > 0) { btnContainer.style.display = 'block'; document.getElementById('count-to-delete').innerText = toDeleteCount; } else { btnContainer.style.display = 'none'; } if(fi!=="") { let teo = totalSys + nw - bj - rec; let dif = parseInt(fi) - teo; document.getElementById('inv-msg').innerHTML = dif===0 ? "✅ CUADRADO" : `<span style='color:red'>⚠️ DIFERENCIA: ${dif}</span>`; } } return {r,c,g,b,n, cobradas: tarjetasCobradas}; };
+    window.calc = () => { let r=0, g=0, b=0, tarjetasCobradas=0; document.querySelectorAll('.item-container').forEach(el => { if(el.querySelector('.tal-del')) { let m = parseFloat(el.querySelector('.monto-tal').value)||0; r+=m; let d = parseInt(el.querySelector('.tal-del').value)||0, a = parseInt(el.querySelector('.tal-al').value)||0; if(a>=d) tarjetasCobradas += (a-d+1); } }); document.querySelectorAll('.monto-gas').forEach(i=>g+=parseFloat(i.value)||0); document.querySelectorAll('.monto-ban').forEach(i=>b+=parseFloat(i.value)||0); let c = r * 0.10; let n = r - c - g - b; ['lbl_tal','res_ing'].forEach(id=>document.getElementById(id).innerText="L. "+r.toFixed(2)); ['lbl_gas','res_gas'].forEach(id=>document.getElementById(id).innerText="L. "+g.toFixed(2)); ['lbl_ban','res_ban'].forEach(id=>document.getElementById(id).innerText="L. "+b.toFixed(2)); document.getElementById('res_com').innerText="L. "+c.toFixed(2); ['res_neto'].forEach(id=>document.getElementById(id).innerText="L. "+n.toFixed(2)); if(totalSys > 0) { let eff = Math.round((tarjetasCobradas / totalSys) * 100); document.getElementById('eff-text').innerText = `Cobraste ${tarjetasCobradas} de ${totalSys} (${eff}%)`; document.getElementById('eff-bar').style.width = eff + "%"; document.getElementById('eff-bar').style.background = eff < 50 ? "#c0392b" : (eff < 80 ? "#f39c12" : "#27ae60"); } if(document.getElementById('inv-fis')) { let nw=parseInt(document.getElementById('inv-new').value)||0, bj=parseInt(document.getElementById('inv-baj').value)||0, rec=parseInt(document.getElementById('inv-rec').value)||0, fi=document.getElementById('inv-fis').value; toDeleteCount = bj + rec; const btnContainer = document.getElementById('btn-conciliacion-container'); if(btnContainer) { if(toDeleteCount > 0) { btnContainer.style.display = 'block'; document.getElementById('count-to-delete').innerText = toDeleteCount; } else { btnContainer.style.display = 'none'; } } if(fi!=="") { let teo = totalSys + nw - bj - rec; let dif = parseInt(fi) - teo; document.getElementById('inv-msg').innerHTML = dif===0 ? "✅ CUADRADO" : `<span style='color:red'>⚠️ DIFERENCIA: ${dif}</span>`; } } return {r,c,g,b,n, cobradas: tarjetasCobradas}; };
     ['inv-new','inv-baj','inv-rec','inv-fis'].forEach(id=>{if(document.getElementById(id)) document.getElementById(id).addEventListener('input',calc)});
     window.abrirVistaPrevia = async () => { const c = calc(); document.getElementById('p-zona').innerText = document.getElementById('zonaSelect').value; document.getElementById('p-semana-title').innerText = (document.getElementById('txt_semana').value || "LIQUIDACIÓN").toUpperCase(); document.getElementById('p-fecha').innerText = document.getElementById('fecha_liquidacion').value; document.getElementById('p-rec').innerText = "L. "+c.r.toFixed(2); document.getElementById('p-com').innerText = "L. "+c.c.toFixed(2); document.getElementById('p-gas').innerText = "L. "+c.g.toFixed(2); document.getElementById('p-ban').innerText = "L. "+c.b.toFixed(2); document.getElementById('p-neto').innerText = "L. "+c.n.toFixed(2); const tbT = document.getElementById('p-tbl-tal'); tbT.innerHTML="<tr><th>#Tal</th><th>Rango</th><th style='text-align:right'>Monto</th></tr>"; document.querySelectorAll('#lista-talonarios .item-container').forEach(d=>{ tbT.innerHTML+=`<tr><td>${d.querySelector('.tal-id').value}</td><td>${d.querySelector('.tal-del').value}-${d.querySelector('.tal-al').value}</td><td style='text-align:right'>L. ${d.querySelector('.monto-tal').value}</td></tr>`; }); const tbG = document.getElementById('p-tbl-gas'); tbG.innerHTML="<tr><th>Descripción</th><th style='text-align:right'>Monto</th></tr>"; document.querySelectorAll('#lista-gastos .dynamic-row').forEach(d=>{ tbG.innerHTML+=`<tr><td>${d.querySelector('.desc-gas').value}</td><td style='text-align:right'>L. ${d.querySelector('.monto-gas').value}</td></tr>`; }); const tbB = document.getElementById('p-tbl-ban'); tbB.innerHTML="<tr><th>Banco / Cuenta / Ref</th><th>Fecha</th><th style='text-align:right'>Monto</th></tr>"; document.querySelectorAll('#lista-banco .item-container').forEach(d=>{ let info = `${d.querySelector('.b-banc').value}<br>${d.querySelector('.b-cta').value}<br>Ref: ${d.querySelector('.b-ref').value}`; tbB.innerHTML+=`<tr><td>${info}</td><td>${d.querySelector('.b-date').value}</td><td style='text-align:right'>L. ${d.querySelector('.monto-ban').value}</td></tr>`; }); document.getElementById('p-cob').innerText = c.cobradas; document.getElementById('p-tot').innerText = totalSys; document.getElementById('p-nocob').innerText = (totalSys - c.cobradas); const z = document.getElementById('zonaSelect').value; const qH = query(collection(db, "historial_tarjetas"), where("zona", "==", z)); const sH = await getDocs(qH); let bajas = []; let seenCards = new Set(); const cutDate = new Date(document.getElementById('fecha_liquidacion').value); cutDate.setDate(cutDate.getDate() - 7); sH.forEach(doc => { const d = doc.data(); const fechaMov = d.fecha.toDate(); if(fechaMov >= cutDate && (d.accion === 'CANCELADA' || d.accion === 'RECOGIDA')) { if (!seenCards.has(d.numero)) { bajas.push(d); seenCards.add(d.numero); } } }); const gridBajas = document.getElementById('p-grid-bajas'); gridBajas.innerHTML = ""; if(bajas.length > 0) { bajas.forEach(b => { gridBajas.innerHTML += `<div class="baja-item-pdf"><strong>#${b.numero}</strong><br>${b.accion.substring(0,4)}<button class="btn-remove-pdf" onclick="this.parentElement.remove()">X</button></div>`; }); } else { gridBajas.innerHTML = `<div style="grid-column: span 4; text-align:center;">- Ninguna -</div>`; } const gridNuevas = document.getElementById('p-grid-nuevas'); gridNuevas.innerHTML = ""; if(sessionNewCards.length > 0) { sessionNewCards.forEach(b => { gridNuevas.innerHTML += `<div class="baja-item-pdf"><strong>#${b.numero}</strong><br>NUEVA</div>`; }); } else { gridNuevas.innerHTML = `<div style="grid-column: span 4; text-align:center;">- Ninguna -</div>`; } let nw=parseInt(document.getElementById('inv-new').value)||0, baj=parseInt(document.getElementById('inv-baj').value)||0, rec=parseInt(document.getElementById('inv-rec').value)||0, fi=document.getElementById('inv-fis').value; let teo = totalSys + nw - baj - rec; document.getElementById('p-sys').innerText=totalSys; document.getElementById('p-new').innerText=nw; document.getElementById('p-baj').innerText=baj; document.getElementById('p-recog').innerText=rec; document.getElementById('p-teo').innerText=teo; document.getElementById('p-fis').innerText=fi; document.getElementById('p-msg').innerText=document.getElementById('inv-msg').innerText; const pGal = document.getElementById('p-gal-mixed'); pGal.innerHTML=""; document.querySelectorAll('#gal-gas img').forEach(i=>{ pGal.innerHTML+=`<div class="pdf-evidence-block"><div class="pdf-evidence-label">GASTO OPERATIVO</div><div class="pdf-image-container"><img src="${i.src}"></div></div>`; }); document.querySelectorAll('#gal-ban img').forEach(i=>{ pGal.innerHTML+=`<div class="pdf-evidence-block"><div class="pdf-evidence-label">VOUCHER BANCO</div><div class="pdf-image-container"><img src="${i.src}"></div></div>`; }); document.getElementById('app-container').style.display = 'none'; document.getElementById('seccion-impresion').style.display = 'block'; document.getElementById('printControls').style.display = 'flex'; };
     window.cerrarVistaPrevia = () => { document.getElementById('seccion-impresion').style.display = 'none'; document.getElementById('printControls').style.display = 'none'; document.getElementById('app-container').style.display = 'block'; }
@@ -704,6 +588,107 @@
     window.loadAdminStats = async () => { const z = document.getElementById('zonaSelect').value; document.getElementById('stat-zona-title').innerText = z; const q = query(collection(db, "historial_cortes"), where("zona", "==", z)); const snap = await getDocs(q); let docsArray = []; snap.forEach(doc => { docsArray.push({ id: doc.id, ...doc.data() }); }); docsArray.sort((a, b) => a.fecha.seconds - b.fecha.seconds); let l=[], d=[], tHTML=""; docsArray.forEach(data => { const date = data.fecha.toDate().toLocaleDateString('es-HN'); l.push(date); d.push(data.recaudado); tHTML += `<tr><td>${date}</td><td>${data.semana||'-'}</td><td>L. ${data.recaudado}</td><td>L. ${data.comision}</td><td><button class="btn-del-row" onclick="deleteStat('${data.id}')">🗑️</button></td></tr>`; }); document.getElementById('admin-stats-body').innerHTML = tHTML; if(adminChartInst) adminChartInst.destroy(); adminChartInst = new Chart(document.getElementById('adminChart'), { type:'line', data:{labels:l, datasets:[{label:'Tendencia Recaudo', data:d, borderColor:'#e74c3c', tension:0.3}]} }); }
     window.deleteStat = async (id) => { if(!confirm("¿Eliminar?")) return; try { await deleteDoc(doc(db, "historial_cortes", id)); alert("Eliminado"); loadAdminStats(); } catch (e) { alert("Error: " + e.message); } }
     window.cargarDash = async () => { const z = document.getElementById('zonaSelect').value; const dStart = document.getElementById('dash-start').value; const dEnd = document.getElementById('dash-end').value; document.getElementById('dash-zona').innerText = z; document.getElementById('dash-name').innerText = currentUser.username; const qT = query(collection(db, "tarjetas_fisicas"), where("zona", "==", z)); const sT = await getDocs(qT); const currentRouteCards = sT.size; const start = new Date(dStart + "T00:00:00"); const end = new Date(dEnd + "T23:59:59"); const qH = query(collection(db, "historial_cortes"), where("zona", "==", z)); const sH = await getDocs(qH); let docs = []; sH.forEach(doc => docs.push(doc.data())); docs = docs.filter(d => d.fecha.toDate() >= start && d.fecha.toDate() <= end); docs.sort((a,b) => a.fecha.seconds - b.fecha.seconds); let dates=[], recaudos=[], comisiones=[], totRec=0, totCom=0, totCob=0; let tHTML = ""; docs.forEach(dt=>{ const dateStr = dt.fecha.toDate().toLocaleDateString('es-HN',{day:'numeric',month:'short'}); dates.push(dateStr); recaudos.push(dt.recaudado); comisiones.push(dt.comision); totRec+=dt.recaudado||0; totCom+=dt.comision||0; totCob+=dt.tarjetas_cobradas||0; tHTML += `<tr><td>${dateStr}</td><td>${dt.tarjetas_cobradas||0}</td><td>L. ${dt.recaudado.toLocaleString()}</td><td>L. ${dt.comision.toLocaleString()}</td></tr>`; }); document.getElementById('kpi-recaudo').innerText="L. "+totRec.toLocaleString(); document.getElementById('kpi-com').innerText="L. "+totCom.toLocaleString(); document.getElementById('kpi-cobradas').innerText = `${totCob} / ${currentRouteCards}`; document.getElementById('dash-history-body').innerHTML = tHTML; if(chartEff) chartEff.destroy(); const pending = currentRouteCards - totCob; const efficiencyPercent = currentRouteCards > 0 ? Math.round((totCob/currentRouteCards)*100) : 0; document.getElementById('chart-center-val').innerText = efficiencyPercent + "%"; chartEff = new Chart(document.getElementById('chartEfficiency'), { type: 'doughnut', data: { labels: ['Cobradas', 'Pendientes'], datasets: [{ data: [totCob, (pending > 0 ? pending : 0)], backgroundColor: ['#27ae60', '#ecf0f1'], borderWidth: 0 }] }, options: { cutout: '70%', plugins: { legend: { display: false } } } }); if(chartMon) chartMon.destroy(); chartMon = new Chart(document.getElementById('chartMoney'), { type: 'bar', data: { labels: dates, datasets: [ { label: 'Recaudado', data: recaudos, backgroundColor: '#2980b9' }, { label: 'Comisión', data: comisiones, backgroundColor: '#f39c12' } ] }, options: { scales: { y: { beginAtZero: true } } } }); }
+
+    // --- NUEVA FUNCIONALIDAD RUTA (COBROS) ---
+    window.cargarRuta = async () => {
+        const z = document.getElementById('zonaSelect').value;
+        document.getElementById('ruta-zona-display').innerText = z;
+        const list = document.getElementById('lista-ruta-container');
+        list.innerHTML = "<div style='text-align:center; padding:20px;'>Cargando...</div>";
+
+        // Query simple: Traer todas las tarjetas de la zona
+        const q = query(collection(db, "tarjetas_fisicas"), where("zona", "==", z));
+        const snap = await getDocs(q);
+        
+        let rutaCards = [];
+        snap.forEach(d => rutaCards.push({ id: d.id, ...d.data() }));
+        rutaCards.sort((a,b) => a.clave.localeCompare(b.clave)); // Ordenar por Clave
+
+        // ACTUALIZAR CONTADOR HEADER
+        document.getElementById('ruta-total-cards').innerText = `Total: ${rutaCards.length}`;
+
+        list.innerHTML = "";
+        if(rutaCards.length === 0) {
+            list.innerHTML = "<div style='text-align:center; padding:20px;'>No hay tarjetas en esta zona.</div>";
+            return;
+        }
+
+        rutaCards.forEach(c => {
+            let statusHTML = `<span class="ruta-badge bg-wait">⚠️ Sin Historial</span>`;
+            
+            if(c.ultimo_pago) {
+                const last = c.ultimo_pago.toDate();
+                const now = new Date();
+                const diffTime = Math.abs(now - last);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+
+                if(diffDays <= 8) {
+                    statusHTML = `<span class="ruta-badge bg-ok">🟢 Al Día (${diffDays}d)</span>`;
+                } else {
+                    const weeks = Math.floor(diffDays / 7);
+                    statusHTML = `<span class="ruta-badge bg-late">🔴 Mora: ${weeks} Sem.</span>`;
+                }
+            }
+
+            list.innerHTML += `
+            <div class="ruta-item">
+                <div class="ruta-info">
+                    <h4>${c.clave} - #${c.numero}</h4>
+                    ${statusHTML}
+                </div>
+                <button class="btn-pay" onclick="openAbono('${c.id}', '${c.clave}', '${c.numero}')">💰 ABONAR</button>
+            </div>`;
+        });
+    }
+
+    window.openAbono = (id, clave, num) => {
+        document.getElementById('abonoModal').style.display = 'flex';
+        document.getElementById('abono-info').innerText = `${clave} - #${num}`;
+        document.getElementById('abono-info').dataset.id = id;
+        document.getElementById('abono-monto').focus();
+    }
+
+    window.closeAbono = () => {
+        document.getElementById('abonoModal').style.display = 'none';
+        document.getElementById('abono-recibo').value = "";
+        document.getElementById('abono-monto').value = "";
+    }
+
+    window.confirmarAbono = async () => {
+        const id = document.getElementById('abono-info').dataset.id;
+        const monto = document.getElementById('abono-monto').value;
+        const recibo = document.getElementById('abono-recibo').value;
+
+        if(!monto || !recibo) return alert("Faltan datos");
+
+        try {
+            await updateDoc(doc(db, "tarjetas_fisicas", id), {
+                ultimo_pago: new Date()
+            });
+
+            await addDoc(collection(db, "historial_tarjetas"), {
+                fecha: new Date(),
+                zona: document.getElementById('zonaSelect').value,
+                clave: document.getElementById('abono-info').innerText.split(' - ')[0],
+                numero: document.getElementById('abono-info').innerText.split(' - ')[1].replace('#',''),
+                accion: `PAGO: L.${monto} (Rec:${recibo})`,
+                usuario: currentUser.username
+            });
+
+            alert("✅ Pago registrado");
+            closeAbono();
+            cargarRuta(); // Refrescar lista para verla verde
+        } catch(e) {
+            alert("Error: " + e.message);
+        }
+    }
+
+    window.filtrarRuta = () => {
+        const q = document.getElementById('search-ruta').value.toLowerCase();
+        document.querySelectorAll('.ruta-item').forEach(el => {
+            el.style.display = el.innerText.toLowerCase().includes(q) ? 'flex' : 'none';
+        });
+    }
 </script>
 </body>
 </html>
