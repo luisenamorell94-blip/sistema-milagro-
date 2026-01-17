@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Grupo Milagro | Suite</title>
+    <title>Sistema Milagro | Restaurado</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#1a252f">
+    <meta name="theme-color" content="#2c3e50">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
@@ -15,52 +15,27 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        /* ESTILOS GENERALES */
-        :root { --primary: #2c3e50; --secondary: #34495e; --accent: #27ae60; --blue: #2980b9; --money: #117a65; --bank: #8e44ad; --alert: #c0392b; --design: #8e44ad; --fleet: #d35400; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; margin: 0; padding: 0; padding-bottom: 80px; -webkit-tap-highlight-color: transparent; }
-        .container { max-width: 900px; margin: 0 auto; padding: 10px; }
+        /* ESTILOS ORIGINALES (QUE SI FUNCIONAN) */
+        :root { --primary: #2c3e50; --secondary: #34495e; --accent: #27ae60; --blue: #2980b9; --money: #117a65; --bank: #8e44ad; --alert: #c0392b; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; margin: 0; padding: 10px; padding-bottom: 80px; -webkit-tap-highlight-color: transparent; }
+        .container { max-width: 900px; margin: 0 auto; }
         
-        /* SUPER MENU (EL ASCENSOR) */
-        .super-nav {
-            background: #1a252f;
-            padding: 10px;
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            position: sticky;
-            top: 0;
-            z-index: 9000;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-        .nav-pill {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-weight: bold;
-            font-size: 0.9em;
-            cursor: pointer;
-            white-space: nowrap;
-            opacity: 0.6;
-            transition: 0.3s;
-            text-align: center;
-        }
-        .nav-pill.active { opacity: 1; transform: scale(1.05); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .nav-pill i { display: block; font-size: 1.2em; margin-bottom: 2px; font-style: normal; }
+        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #2c3e50; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; }
+        .login-box { background: white; padding: 40px 30px; border-radius: 15px; width: 90%; max-width: 340px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
+        .cm-logo { font-size: 3em; font-weight: 900; color: var(--primary); border: 4px solid var(--primary); padding: 10px; border-radius: 10px; display: inline-block; margin-bottom: 20px; letter-spacing: -2px; }
+        .login-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; font-size: 16px; text-align: center; color: #333; background: #f9f9f9; }
+        .login-btn { background: var(--blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 20px; transition: background 0.3s; }
+        
+        #restore-msg { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); background: #2ecc71; color: white; padding: 10px 20px; border-radius: 30px; font-weight: bold; z-index: 10001; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
 
-        /* SECCIONES DE LA APP */
-        .app-module { display: none; animation: fadeIn 0.4s; }
-        .app-module.active-module { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* ESTILOS ESPECIFICOS COBRANZA (Heredados v41) */
+        header { background: linear-gradient(135deg, #1a252f 0%, #2c3e50 100%); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
         .card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 15px; }
         .tabs { display: flex; gap: 5px; margin-bottom: 15px; overflow-x: auto; }
         .tab-btn { flex: 1; padding: 12px; border: none; background: #e0e0e0; border-radius: 5px; font-weight: bold; cursor: pointer; white-space: nowrap; color: #555; }
         .tab-btn.active { background: var(--blue); color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .view-section { display: none; }
         .view-section.active { display: block; animation: fadeIn 0.3s; }
+
         .item-container { border: 1px solid #eee; background: #fafafa; padding: 8px; margin-bottom: 8px; border-radius: 6px; }
         .dynamic-row { display: flex; gap: 5px; margin-bottom: 5px; }
         input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 0.9em; }
@@ -68,8 +43,11 @@
         .btn-add { width: 100%; padding: 10px; background: #ecf0f1; border: 1px dashed #bdc3c7; cursor: pointer; margin-top: 5px; font-weight: bold; }
         .btn-del { background: #e74c3c; color: white; border: none; border-radius: 4px; padding: 5px 15px; font-weight: bold; cursor: pointer; }
         .btn-main { background: var(--primary); color: white; border: none; padding: 15px; width: 100%; border-radius: 6px; font-weight: bold; font-size: 16px; margin-top: 10px; cursor: pointer; }
-        .money-card { border-left: 5px solid var(--money); background: #f4fbf9; }
-        .money-result { font-size: 1.8em; font-weight: bold; color: var(--money); display:block; text-align:right; }
+        .btn-clear { background: #7f8c8d; color: white; border: none; padding: 15px; width: 100%; border-radius: 6px; font-weight: bold; font-size: 16px; margin-top: 10px; cursor: pointer; }
+        .btn-danger { background: var(--alert); color: white; border: none; padding: 15px; width: 100%; border-radius: 6px; font-weight: bold; font-size: 16px; margin-top: 10px; cursor: pointer; }
+        .btn-del-row { background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.8em; }
+        .btn-remove-pdf { background: red; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-weight: bold; font-size: 10px; margin-left: 5px; }
+
         .gallery { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
         .thumb { width: 70px; height: 70px; background: #eee; border-radius: 5px; position: relative; overflow: hidden; border: 1px solid #ccc; }
         .thumb img { width: 100%; height: 100%; object-fit: cover; }
@@ -78,60 +56,63 @@
         .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .chart-box { background: white; padding: 10px; border-radius: 8px; border: 1px solid #eee; height: 220px; display: flex; justify-content: center; align-items: center; position: relative; }
         
-        /* LOGIN */
-        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #2c3e50; z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; }
-        .login-box { background: white; padding: 40px 30px; border-radius: 15px; width: 90%; max-width: 340px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
-        .cm-logo { font-size: 3em; font-weight: 900; color: var(--primary); border: 4px solid var(--primary); padding: 10px; border-radius: 10px; display: inline-block; margin-bottom: 20px; letter-spacing: -2px; }
-        .login-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; font-size: 16px; text-align: center; color: #333; background: #f9f9f9; }
-        .login-btn { background: var(--blue); color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 20px; transition: background 0.3s; }
-
-        /* LOADING & MSG */
-        #loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); z-index: 30000; justify-content: center; align-items: center; flex-direction: column; }
-        .spinner { border: 8px solid #f3f3f3; border-top: 8px solid #3498db; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        #restore-msg { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: #2ecc71; color: white; padding: 10px 20px; border-radius: 30px; font-weight: bold; z-index: 9001; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-
-        /* TABLAS COMUNES */
         .data-table { width: 100%; border-collapse: collapse; font-size: 0.85em; margin-top: 10px; }
         .data-table th { background: #ecf0f1; padding: 8px; text-align: left; border-bottom: 2px solid #bdc3c7; }
         .data-table td { padding: 8px; border-bottom: 1px solid #eee; vertical-align: middle; }
-        .btn-del-row { background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.8em; }
 
-        /* ESTILOS DISEÑO GRAFICO */
-        .project-card { border-left: 5px solid var(--design); position: relative; }
-        .status-badge { padding: 3px 8px; border-radius: 10px; font-size: 0.7em; font-weight: bold; color: white; }
-        .status-pending { background: #f39c12; }
-        .status-paid { background: #27ae60; }
+        .money-card { border-left: 5px solid var(--money); background: #f4fbf9; }
+        .money-result { font-size: 1.8em; font-weight: bold; color: var(--money); display:block; text-align:right; }
+        .row-det { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.95em; border-bottom: 1px dotted #eee; padding-bottom: 2px; }
+        .efficiency-bar { height: 10px; background: #eee; border-radius: 5px; margin-top: 5px; overflow: hidden; }
+        .efficiency-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.5s; }
+        .efficiency-text { text-align: center; font-weight: bold; font-size: 0.9em; margin-top: 5px; color: #333; }
 
-        /* ESTILOS FLOTA */
-        .fleet-card { border-left: 5px solid var(--fleet); }
+        .zones-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin: 10px 0; text-align: left; max-height: 150px; overflow-y: auto; background: #fff; border: 1px solid #ddd; padding: 5px; }
+        .zone-check { display: flex; align-items: center; font-size: 0.85em; padding: 5px; border-bottom: 1px solid #eee; }
+        .user-item { display: flex; justify-content: space-between; background: #fff; padding: 10px; border-bottom: 1px solid #eee; align-items: center; }
 
-        /* IMPRESIÓN */
+        .modal-overlay { display: none; position: fixed; z-index: 20000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); align-items: center; justify-content: center; }
+        .modal-content { background-color: #fff; padding: 20px; width: 90%; max-width: 500px; border-radius: 10px; position: relative; box-shadow: 0 5px 25px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; }
+        .modal-header { font-weight: bold; font-size: 1.2em; margin-bottom: 15px; color: #2c3e50; text-align: center; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .modal-counter { font-size: 2.5em; font-weight: bold; text-align: center; margin: 10px 0; display: block; color: #c0392b; }
+        .close-modal { position: absolute; top: 10px; right: 15px; font-size: 28px; font-weight: bold; cursor: pointer; }
+        
+        #loading-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); z-index: 30000; justify-content: center; align-items: center; flex-direction: column; }
+        .spinner { border: 8px solid #f3f3f3; border-top: 8px solid #3498db; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* IMPRESIÓN PDF PERFECTO */
         #seccion-impresion { display: none; }
         @media print {
             body { background: white; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; color: #333; }
-            .container, .super-nav, #login-screen, #printControls, .modal-overlay, .btn-remove-pdf, #loading-overlay, #restore-msg { display: none !important; }
+            .container, #login-screen, #printControls, .modal-overlay, .btn-remove-pdf, #loading-overlay, #restore-msg { display: none !important; }
             #seccion-impresion { display: block !important; padding: 20px; box-sizing: border-box; }
-            /* Estilos PDF v40 */
+            
             .pdf-header { display: flex; justify-content: space-between; border-bottom: 3px solid #2c3e50; margin-bottom: 10px; padding-bottom: 5px; }
             .pdf-header h1 { margin: 0; font-size: 22px; text-transform: uppercase; color: #2c3e50; }
             .pdf-title { background: #eee; font-weight: bold; padding: 3px; border-bottom: 1px solid #000; font-size: 11px; margin: 10px 0 3px 0; text-align: center; text-transform: uppercase; }
             .pdf-table { width: 100%; border-collapse: collapse; font-size: 10px; margin-bottom: 5px; }
             .pdf-table th, .pdf-table td { border-bottom: 1px dotted #ccc; padding: 3px; text-align: left; }
+            
             .pdf-summary-container { width: 100%; max-width: 400px; margin-left: auto; margin-top: 10px; border: 2px solid #333; padding: 10px; background: #fdfdfd; page-break-inside: avoid; }
             .pdf-sum-row { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 12px; }
             .pdf-sum-row.plus { color: #27ae60; font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 3px; }
             .pdf-sum-row.minus { color: #c0392b; }
             .pdf-neto-box { border-top: 3px double #333; margin-top: 5px; padding-top: 5px; font-size: 16px; font-weight: bold; color: #2c3e50; text-align: right; background: #eaf2f8; padding: 5px; }
+            .pdf-pressure-box { border: 2px solid #2c3e50; background: #f4f6f7; padding: 5px; margin-top: 10px; text-align: center; font-size: 12px; page-break-inside: avoid; }
             .pdf-inv-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; background: #f4f6f7; padding: 5px; border: 1px solid #ddd; font-size: 10px; text-align: center; margin-top: 10px; page-break-inside: avoid; }
             .pdf-inv-item b { display: block; font-size: 12px; margin-bottom: 2px; }
+            
             .pdf-compact-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; font-size: 10px; border: 1px solid #ccc; padding: 5px; background: #fff; page-break-inside: avoid; }
             .baja-item-pdf { border: 1px solid #eee; padding: 3px; text-align: center; background: #fafafa; }
+            
+            /* FOTOS VERTICALES GRANDES */
             .pdf-evidence-section { page-break-before: always; margin-top: 20px; display: block; }
             .pdf-evidence-block { width: 100%; height: 45vh; border: 2px solid #333; margin-bottom: 10px; padding: 5px; box-sizing: border-box; page-break-inside: avoid; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
             .pdf-evidence-label { width: 100%; text-align: center; font-weight: bold; font-size: 14px; background: #eee; border-bottom: 2px solid #333; margin-bottom: 5px; padding: 2px 0; text-transform: uppercase; }
             .pdf-image-container { flex: 1; width: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; }
             .pdf-image-container img { max-width: 99%; max-height: 98%; object-fit: contain; }
+
             .pdf-signatures { display: flex; justify-content: space-between; margin-top: 30px; padding: 0 40px; page-break-inside: avoid; }
             .sign-line { border-top: 1px solid black; width: 40%; text-align: center; font-size: 12px; padding-top: 5px; }
         }
@@ -144,214 +125,236 @@
 
 <div id="login-screen">
     <div class="login-box">
-        <div class="cm-logo">GM</div>
-        <h3 style="margin-top:0; color:#333;">GRUPO MILAGRO</h3>
+        <div class="cm-logo">CM</div>
+        <h3 style="margin-top:0; color:#333;">COMERCIAL MILAGRO</h3>
         <input type="text" id="loginUser" placeholder="Usuario">
         <input type="password" id="loginPass" placeholder="Contraseña">
-        <button class="login-btn" onclick="iniciarSesion()">ACCEDER A LA SUITE</button>
+        <button class="login-btn" onclick="iniciarSesion()">ENTRAR AL SISTEMA</button>
         <p id="loginMsg" style="color:#c0392b; display:none; margin-top:10px; font-weight:bold;"></p>
     </div>
 </div>
 
-<nav class="super-nav" id="main-nav" style="display:none;">
-    <button class="nav-pill active" onclick="switchApp('cobranza', this)" style="background:var(--money);">
-        <i>🏦</i> Comercial Milagro
-    </button>
-    <button class="nav-pill" onclick="switchApp('diseno', this)" style="background:var(--design);">
-        <i>🎨</i> DesignFlow
-    </button>
-    <button class="nav-pill" onclick="switchApp('flota', this)" style="background:var(--fleet);">
-        <i>🚛</i> CM Control
-    </button>
-    <button class="nav-pill" onclick="logout()" style="background:#7f8c8d; min-width:50px;">
-        <i>🚪</i>
-    </button>
-</nav>
+<div id="printControls" style="display:none; position:fixed; top:0; left:0; width:100%; background:#2c3e50; padding:15px; justify-content:space-around; z-index:10000; box-shadow:0 4px 10px rgba(0,0,0,0.3);">
+    <button onclick="cerrarVistaPrevia()" style="padding:10px 20px; border-radius:20px; font-weight:bold; border:none; background:#e74c3c; color:white;">❌ VOLVER</button>
+    <button onclick="window.print()" style="padding:10px 20px; border-radius:20px; font-weight:bold; border:none; background:#2ecc71; color:white;">🖨️ IMPRIMIR</button>
+</div>
 
-<div id="app-cobranza" class="app-module active-module">
-    <div class="container">
-        <header>
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="font-size: 1.8em;">🏦</div>
-                <div><h2 style="margin:0; font-size:1.1em;">SISTEMA DE COBROS</h2><small id="user-display"></small></div>
+<div id="conciliacionModal" class="modal-overlay">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeConciliacion()">×</span>
+        <div class="modal-header">⚠️ BAJA DE TARJETAS</div>
+        <p style="text-align:center;">Busca y elimina la tarjeta.</p>
+        <div style="background:#f9f9f9; padding:10px; border-radius:10px; text-align:center;">
+            <small>Faltan por eliminar:</small>
+            <span class="modal-counter" id="cards-to-delete-count">0</span>
+        </div>
+        <div style="margin-top:15px;">
+            <input type="text" id="modal-search" placeholder="Buscar Clave o Número..." onkeyup="searchForDeletion()" style="font-size:1.2em; text-align:center; margin-bottom:10px;">
+            <div style="max-height:250px; overflow-y:scroll; border:1px solid #eee;">
+                <table class="data-table"><thead><tr><th>Clave</th><th>#</th><th>Acción</th></tr></thead><tbody id="modal-table-body"></tbody></table>
             </div>
-        </header>
+        </div>
+    </div>
+</div>
 
-        <div class="card" style="background:#fff3cd; border:1px solid #ffeeba; padding:10px;">
-            <label style="font-weight:bold; font-size:0.8em; color:#856404;">ZONA DE TRABAJO</label>
-            <select id="zonaSelect" style="margin-top:5px; font-weight:bold; width:100%;"></select>
+<div id="historyModal" class="modal-overlay">
+    <div class="modal-content" style="max-width:700px;">
+        <span class="close-modal" onclick="closeHistory()">×</span>
+        <div class="modal-header">📜 HISTORIAL</div>
+        <div style="max-height:400px; overflow-y:scroll;">
+            <table class="data-table">
+                <thead><tr><th>Fecha</th><th>Tarjeta</th><th>Acción</th><th>Usuario</th></tr></thead>
+                <tbody id="history-table-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="container" id="app-container" style="display:none;">
+    <header>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="font-size: 1.8em;">🏦</div>
+            <div><h2 style="margin:0; font-size:1.1em;">COMERCIAL MILAGRO</h2><small id="user-display"></small></div>
+        </div>
+        <button onclick="logout()" style="background:transparent; border:1px solid white; color:white; padding:5px 10px; border-radius:4px; cursor:pointer;">Cerrar</button>
+    </header>
+
+    <div class="card" style="background:#fff3cd; border:1px solid #ffeeba; padding:10px;">
+        <label style="font-weight:bold; font-size:0.8em; color:#856404;">ZONA DE TRABAJO</label>
+        <select id="zonaSelect" style="margin-top:5px; font-weight:bold; width:100%;"></select>
+    </div>
+
+    <div class="tabs" id="tabs-admin">
+        <button class="tab-btn active" onclick="nav('cuadre')">📝 Liquidación</button>
+        <button class="tab-btn" onclick="nav('stats')">📊 Estadísticas</button>
+        <button class="tab-btn" onclick="nav('usuarios')">👥 Usuarios</button>
+        <button class="tab-btn" onclick="nav('base')">🗃️ Base Datos</button>
+    </div>
+    <div class="tabs" id="tabs-cobrador" style="display:none;">
+        <button class="tab-btn active" style="background:var(--accent); color:white;">📈 Mi Rendimiento</button>
+    </div>
+
+    <div id="view-cuadre" class="view-section active">
+        <div class="card" style="text-align:center;">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <div><label class="lbl-small">FECHA CORTE</label><input type="date" id="fecha_liquidacion" style="font-weight:bold; text-align:center;"></div>
+                <div><label class="lbl-small">PERIODO / SEMANA</label><input type="text" id="txt_semana" placeholder="Ej: SEMANA 1 ENERO" style="font-weight:bold; text-align:center;"></div>
+            </div>
         </div>
 
-        <div class="tabs" id="tabs-admin">
-            <button class="tab-btn active" onclick="nav('cuadre')">📝 Liquidación</button>
-            <button class="tab-btn" onclick="nav('stats')">📊 Estadísticas</button>
-            <button class="tab-btn" onclick="nav('usuarios')">👥 Usuarios</button>
-            <button class="tab-btn" onclick="nav('base')">🗃️ Base Datos</button>
+        <div class="card money-card">
+            <h3 style="margin:0 0 10px 0; color:var(--money);">1. Ingresos</h3>
+            <div id="lista-talonarios"></div>
+            <button class="btn-add" onclick="addTal()">+ Agregar Talonario</button>
+            <div style="margin-top:15px; padding:10px; background:white; border-radius:5px; border:1px solid #ddd;">
+                <label style="font-size:0.8em; font-weight:bold; color:#555;">EFICIENCIA DE COBRO</label>
+                <div class="efficiency-text" id="eff-text">Cobraste 0 de 0 (0%)</div>
+                <div class="efficiency-bar"><div class="efficiency-fill" id="eff-bar"></div></div>
+            </div>
+            <div style="text-align:right; font-weight:bold; margin-top:10px; font-size:1.1em; color:var(--money);">Total Recaudado: <span id="lbl_tal">L. 0.00</span></div>
         </div>
-        <div class="tabs" id="tabs-cobrador" style="display:none;">
-            <button class="tab-btn active" style="background:var(--accent); color:white;">📈 Mi Rendimiento</button>
+
+        <div class="card" style="border-left: 5px solid #c0392b;">
+            <h3 style="margin:0 0 10px 0; color:#c0392b;">2. Deducciones</h3>
+            <label style="font-weight:bold; font-size:0.9em;">A. Gastos Operativos</label>
+            <div id="lista-gastos"></div>
+            <button class="btn-add" onclick="addGas()">+ Gasto</button>
+            <div style="margin-top:5px;"><input type="file" id="in-gas-pic" accept="image/*" multiple hidden onchange="procPic(this, 'gal-gas')"><button class="btn-cam" onclick="document.getElementById('in-gas-pic').click()">📷 FOTOS GASTOS</button><div id="gal-gas" class="gallery"></div></div>
+            <div style="text-align:right; font-weight:bold; margin:5px 0 15px 0; color:#c0392b;">Subtotal Gastos: <span id="lbl_gas">L. 0.00</span></div>
+            <hr style="border:0; border-top:1px dashed #ccc; margin:10px 0;">
+            <label style="font-weight:bold; font-size:0.9em; color:var(--bank);">B. Depósitos Banco</label>
+            <div id="lista-banco"></div>
+            <button class="btn-add" onclick="addBan()">+ Voucher</button>
+            <div style="margin-top:5px;"><input type="file" id="in-ban-pic" accept="image/*" multiple hidden onchange="procPic(this, 'gal-ban')"><button class="btn-cam" onclick="document.getElementById('in-ban-pic').click()" style="background:var(--bank);">📷 FOTOS BANCO</button><div id="gal-ban" class="gallery"></div></div>
+            <div style="text-align:right; font-weight:bold; margin-top:5px; color:var(--bank);">Subtotal Banco: <span id="lbl_ban">L. 0.00</span></div>
         </div>
 
-        <div id="view-cuadre" class="view-section active">
-            <div class="card" style="text-align:center;">
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <div><label class="lbl-small">FECHA CORTE</label><input type="date" id="fecha_liquidacion" style="font-weight:bold; text-align:center;"></div>
-                    <div><label class="lbl-small">PERIODO / SEMANA</label><input type="text" id="txt_semana" placeholder="Ej: SEMANA 1 ENERO" style="font-weight:bold; text-align:center;"></div>
-                </div>
+        <div class="card">
+            <h3 style="margin:0 0 10px 0;">3. Resumen Final</h3>
+            <div style="background:#f9f9f9; padding:15px; border-radius:5px;">
+                <div class="row-det"><span>(+) Recaudado:</span><span id="res_ing">L. 0.00</span></div>
+                <div class="row-det"><span>(-) Comisión (10%):</span><span id="res_com" style="color:var(--alert);">L. 0.00</span></div>
+                <div class="row-det"><span>(-) Total Gastos:</span><span id="res_gas" style="color:var(--alert);">L. 0.00</span></div>
+                <div class="row-det"><span>(-) Total Banco:</span><span id="res_ban" style="color:var(--bank);">L. 0.00</span></div>
+                <div style="border-top:2px dashed #333; margin-top:10px; padding-top:10px;"><span style="font-size:0.9em; font-weight:bold;">EFECTIVO NETO A ENTREGAR:</span><span id="res_neto" class="money-result">L. 0.00</span></div>
             </div>
+        </div>
 
-            <div class="card money-card">
-                <h3 style="margin:0 0 10px 0; color:var(--money);">1. Ingresos</h3>
-                <div id="lista-talonarios"></div>
-                <button class="btn-add" onclick="addTal()">+ Agregar Talonario</button>
-                <div style="margin-top:15px; padding:10px; background:white; border-radius:5px; border:1px solid #ddd;">
-                    <label style="font-size:0.8em; font-weight:bold; color:#555;">EFICIENCIA DE COBRO</label>
-                    <div class="efficiency-text" id="eff-text">Cobraste 0 de 0 (0%)</div>
-                    <div class="efficiency-bar"><div class="efficiency-fill" id="eff-bar"></div></div>
-                </div>
-                <div style="text-align:right; font-weight:bold; margin-top:10px; font-size:1.1em; color:var(--money);">Total Recaudado: <span id="lbl_tal">L. 0.00</span></div>
+        <div class="card">
+            <h3 style="margin:0 0 10px 0; color:var(--primary);">📦 Inventario Tarjetas</h3>
+            <div style="text-align:center; margin-bottom:5px;">Sistema: <strong id="total-sys">0</strong></div>
+            <div class="dynamic-row">
+                <div><span class="lbl-small" style="color:green;">(+)Nuevas</span><input type="number" id="inv-new" placeholder="0"></div>
+                <div><span class="lbl-small" style="color:red;">(-)Cancel</span><input type="number" id="inv-baj" placeholder="0" oninput="calc()"></div>
+                <div><span class="lbl-small" style="color:orange;">(-)Recog</span><input type="number" id="inv-rec" placeholder="0" oninput="calc()"></div>
             </div>
-
-            <div class="card" style="border-left: 5px solid #c0392b;">
-                <h3 style="margin:0 0 10px 0; color:#c0392b;">2. Deducciones</h3>
-                <label style="font-weight:bold; font-size:0.9em;">A. Gastos Operativos</label>
-                <div id="lista-gastos"></div>
-                <button class="btn-add" onclick="addGas()">+ Gasto</button>
-                <div style="margin-top:5px;"><input type="file" id="in-gas-pic" accept="image/*" multiple hidden onchange="procPic(this, 'gal-gas')"><button class="btn-cam" onclick="document.getElementById('in-gas-pic').click()">📷 FOTOS GASTOS</button><div id="gal-gas" class="gallery"></div></div>
-                <div style="text-align:right; font-weight:bold; margin:5px 0 15px 0; color:#c0392b;">Subtotal Gastos: <span id="lbl_gas">L. 0.00</span></div>
-                <hr style="border:0; border-top:1px dashed #ccc; margin:10px 0;">
-                <label style="font-weight:bold; font-size:0.9em; color:var(--bank);">B. Depósitos Banco</label>
-                <div id="lista-banco"></div>
-                <button class="btn-add" onclick="addBan()">+ Voucher</button>
-                <div style="margin-top:5px;"><input type="file" id="in-ban-pic" accept="image/*" multiple hidden onchange="procPic(this, 'gal-ban')"><button class="btn-cam" onclick="document.getElementById('in-ban-pic').click()" style="background:var(--bank);">📷 FOTOS BANCO</button><div id="gal-ban" class="gallery"></div></div>
-                <div style="text-align:right; font-weight:bold; margin-top:5px; color:var(--bank);">Subtotal Banco: <span id="lbl_ban">L. 0.00</span></div>
-            </div>
-
-            <div class="card">
-                <h3 style="margin:0 0 10px 0;">3. Resumen Final</h3>
-                <div style="background:#f9f9f9; padding:15px; border-radius:5px;">
-                    <div class="row-det"><span>(+) Recaudado:</span><span id="res_ing">L. 0.00</span></div>
-                    <div class="row-det"><span>(-) Comisión (10%):</span><span id="res_com" style="color:var(--alert);">L. 0.00</span></div>
-                    <div class="row-det"><span>(-) Total Gastos:</span><span id="res_gas" style="color:var(--alert);">L. 0.00</span></div>
-                    <div class="row-det"><span>(-) Total Banco:</span><span id="res_ban" style="color:var(--bank);">L. 0.00</span></div>
-                    <div style="border-top:2px dashed #333; margin-top:10px; padding-top:10px;"><span style="font-size:0.9em; font-weight:bold;">EFECTIVO NETO A ENTREGAR:</span><span id="res_neto" class="money-result">L. 0.00</span></div>
-                </div>
-            </div>
-
-            <div class="card">
-                <h3 style="margin:0 0 10px 0; color:var(--primary);">📦 Inventario Tarjetas</h3>
-                <div style="text-align:center; margin-bottom:5px;">Sistema: <strong id="total-sys">0</strong></div>
+            
+            <div style="background:#eafaf1; padding:10px; border:1px solid #d5f5e3; border-radius:5px; margin-top:10px;">
+                <label style="font-weight:bold; font-size:0.8em; color:#27ae60;">AGREGAR TARJETA NUEVA (RUTA)</label>
                 <div class="dynamic-row">
-                    <div><span class="lbl-small" style="color:green;">(+)Nuevas</span><input type="number" id="inv-new" placeholder="0"></div>
-                    <div><span class="lbl-small" style="color:red;">(-)Cancel</span><input type="number" id="inv-baj" placeholder="0" oninput="calc()"></div>
-                    <div><span class="lbl-small" style="color:orange;">(-)Recog</span><input type="number" id="inv-rec" placeholder="0" oninput="calc()"></div>
+                    <input type="text" id="quick-clave" placeholder="Clave (C-100)" style="flex:1;">
+                    <input type="text" id="quick-num" placeholder="# Numero" style="flex:1;">
+                    <button class="btn-add" onclick="quickAddCard()" style="flex:1; background:#2ecc71; color:white; border:none;">+ AGREGAR</button>
                 </div>
-                
-                <div style="background:#eafaf1; padding:10px; border:1px solid #d5f5e3; border-radius:5px; margin-top:10px;">
-                    <label style="font-weight:bold; font-size:0.8em; color:#27ae60;">AGREGAR TARJETA NUEVA (RUTA)</label>
-                    <div class="dynamic-row">
-                        <input type="text" id="quick-clave" placeholder="Clave (C-100)" style="flex:1;">
-                        <input type="text" id="quick-num" placeholder="# Numero" style="flex:1;">
-                        <button class="btn-add" onclick="quickAddCard()" style="flex:1; background:#2ecc71; color:white; border:none;">+ AGREGAR</button>
-                    </div>
-                </div>
-
-                <div id="btn-conciliacion-container" style="display:none; margin-top:10px;">
-                    <button class="btn-danger" style="animation: pulse 1s infinite;" onclick="openConciliacion()">⚠️ ELIMINAR <span id="count-to-delete">0</span> TARJETAS DE LA BASE</button>
-                </div>
-
-                <label style="font-weight:bold; color:var(--secondary); display:block; margin-top:10px;">CONTEO FÍSICO ACTUAL</label>
-                <input type="number" id="inv-fis" placeholder="Total en mano..." style="font-size:1.2em; font-weight:bold;" oninput="calc()">
-                <div id="inv-msg" style="text-align:center; font-weight:bold; margin-top:5px;"></div>
             </div>
 
-            <button class="btn-main" style="background:#e74c3c;" onclick="abrirVistaPrevia()">📄 GENERAR PDF (VISTA PREVIA)</button>
-            <button class="btn-main" onclick="saveData()">💾 GUARDAR DATOS</button>
+            <div id="btn-conciliacion-container" style="display:none; margin-top:10px;">
+                <button class="btn-danger" style="animation: pulse 1s infinite;" onclick="openConciliacion()">⚠️ ELIMINAR <span id="count-to-delete">0</span> TARJETAS DE LA BASE</button>
+            </div>
+
+            <label style="font-weight:bold; color:var(--secondary); display:block; margin-top:10px;">CONTEO FÍSICO ACTUAL</label>
+            <input type="number" id="inv-fis" placeholder="Total en mano..." style="font-size:1.2em; font-weight:bold;" oninput="calc()">
+            <div id="inv-msg" style="text-align:center; font-weight:bold; margin-top:5px;"></div>
         </div>
 
-        <div id="view-stats" class="view-section">
-            <div class="card"><h3>📈 Análisis de Zona</h3><p>Historial: <strong id="stat-zona-title"></strong></p><div class="chart-grid"><div class="chart-box"><canvas id="adminChart"></canvas></div></div><div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>Fecha</th><th>Semana</th><th>Rec.</th><th>Com.</th><th>Acción</th></tr></thead><tbody id="admin-stats-body"></tbody></table></div></div>
-        </div>
-        <div id="view-usuarios" class="view-section">
-            <div class="card" style="border-top:4px solid var(--blue);"><h3>Crear Usuario</h3><input type="text" id="new-user" placeholder="Nombre"><input type="text" id="new-pass" placeholder="Contraseña"><label class="lbl-small">Zonas:</label><div class="zones-grid" id="zones-checkboxes"></div><select id="new-role"><option value="cobrador">Cobrador</option><option value="admin">Admin</option></select><button class="btn-main" onclick="crearUsuario()">Guardar</button></div><div class="card"><h3>Usuarios</h3><div id="lista-usuarios"></div></div>
-        </div>
-        <div id="view-base" class="view-section">
-            <div class="card"><h3 style="text-align:center; color:var(--primary); border-bottom:2px solid var(--primary); padding-bottom:5px;">Total en Base: <span id="db-total-count">0</span></h3><button class="btn-main" style="background:#3498db; margin-bottom:15px;" onclick="openHistory()">📜 VER HISTORIAL</button></div><div class="card" style="border-top: 4px solid var(--accent);"><h3>Agregar Manual</h3><div class="dynamic-row"><input type="text" id="manual-clave" placeholder="Clave"><input type="text" id="manual-num" placeholder="Número"></div><div style="display:flex; gap:5px;"><button class="btn-main" onclick="guardarTarjetaManual()">Guardar</button><button class="btn-clear" onclick="limpiarManual()">Limpiar</button></div></div><div class="card"><h3>Carga CSV</h3><input type="file" id="csvInput"><div style="display:flex; gap:5px;"><button class="btn-main" onclick="uploadCSV()">Subir</button><button class="btn-clear" onclick="limpiarCSV()">Limpiar</button></div></div><div class="card" style="background:#ffecec; border:1px solid red;"><h3 style="color:red;">⚠️ Zona Peligro</h3><button class="btn-danger" onclick="eliminarDuplicadosZona()">🧹 ELIMINAR DUPLICADOS</button><button class="btn-danger" style="margin-top:10px; background:darkred;" onclick="borrarTodaLaZona()">🗑️ BORRAR ZONA</button></div><div class="card"><input type="text" id="search" placeholder="Buscar..." onkeyup="filtrar()"><div style="max-height:400px; overflow-y:scroll; margin-top:10px;"><table class="data-table" id="table-db"><thead><tr><th>Clave</th><th>#</th><th>Acción</th></tr></thead><tbody id="db-body"></tbody></table></div></div>
-        </div>
-        <div id="view-dashboard" class="view-section">
-            <div class="card"><div style="border-bottom:1px solid #eee; margin-bottom:15px; padding-bottom:10px;"><h3>Hola, <span id="dash-name"></span> 👋</h3><p>Zona: <strong id="dash-zona"></strong></p><div style="margin-top:10px; background:#f0f0f0; padding:10px; border-radius:5px;"><label style="font-size:0.7em;">FILTRAR</label><div style="display:flex; gap:5px; margin-top:5px;"><input type="date" id="dash-start" onchange="cargarDash()"><input type="date" id="dash-end" onchange="cargarDash()"></div></div></div><div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;"><div class="stat-box green"><span class="stat-num" id="kpi-cobradas">0 / 0</span><small>Cobradas</small></div><div class="stat-box blue"><span class="stat-num" id="kpi-com">L.0</span><small>Mi Comisión</small></div></div><div style="text-align:center; margin-bottom:20px;"><span style="font-size:2em; font-weight:bold; color:#333;" id="kpi-recaudo">L. 0.00</span><br><small>RECAUDADO</small></div><div class="chart-grid"><div class="chart-box"><canvas id="chartEfficiency"></canvas><div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); pointer-events:none;"><span id="chart-center-val" style="font-size:1.5em; font-weight:bold;">0%</span></div></div><div class="chart-box"><canvas id="chartMoney"></canvas></div></div><h4 style="margin-bottom:5px;">📝 Detalle</h4><div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>Fecha</th><th>Tarjetas</th><th>Recaudo</th><th>Comisión</th></tr></thead><tbody id="dash-history-body"></tbody></table></div></div>
+        <button class="btn-main" style="background:#e74c3c;" onclick="abrirVistaPrevia()">📄 GENERAR PDF (VISTA PREVIA)</button>
+        <button class="btn-main" onclick="saveData()">💾 GUARDAR DATOS</button>
+    </div>
+
+    <div id="view-stats" class="view-section">
+        <div class="card">
+            <h3>📈 Análisis de Zona</h3>
+            <p>Historial: <strong id="stat-zona-title"></strong></p>
+            <div class="chart-grid"><div class="chart-box"><canvas id="adminChart"></canvas></div></div>
+            <div style="overflow-x:auto;">
+                <table class="data-table"><thead><tr><th>Fecha</th><th>Semana</th><th>Rec.</th><th>Com.</th><th>Acción</th></tr></thead><tbody id="admin-stats-body"></tbody></table>
+            </div>
         </div>
     </div>
-</div>
 
-<div id="app-diseno" class="app-module">
-    <div class="container">
-        <header style="background: linear-gradient(135deg, #8e44ad 0%, #2c3e50 100%);">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="font-size: 1.8em;">🎨</div>
-                <div><h2 style="margin:0; font-size:1.1em;">DESIGN FLOW</h2><small>Gestión de Proyectos</small></div>
-            </div>
-        </header>
+    <div id="view-usuarios" class="view-section"><div class="card" style="border-top:4px solid var(--blue);"><h3>Crear Usuario</h3><input type="text" id="new-user" placeholder="Nombre"><input type="text" id="new-pass" placeholder="Contraseña"><label class="lbl-small">Zonas:</label><div class="zones-grid" id="zones-checkboxes"></div><select id="new-role"><option value="cobrador">Cobrador</option><option value="admin">Admin</option></select><button class="btn-main" onclick="crearUsuario()">Guardar</button></div><div class="card"><h3>Usuarios</h3><div id="lista-usuarios"></div></div></div>
+    
+    <div id="view-base" class="view-section">
+        <div class="card">
+            <h3 style="text-align:center; color:var(--primary); border-bottom:2px solid var(--primary); padding-bottom:5px;">Total en Base: <span id="db-total-count">0</span></h3>
+            <button class="btn-main" style="background:#3498db; margin-bottom:15px;" onclick="openHistory()">📜 VER HISTORIAL DE MOVIMIENTOS</button>
+        </div>
         
-        <div class="card project-card">
-            <h3>Nuevo Proyecto</h3>
-            <input type="text" placeholder="Nombre Cliente">
-            <select style="margin-top:5px;"><option>Logotipo</option><option>Banner Redes</option><option>Tarjeta Presentación</option><option>Video Promo</option></select>
-            <div class="dynamic-row" style="margin-top:5px;">
-                <input type="number" placeholder="Precio (L.)">
-                <input type="date">
+        <div class="card" style="border-top: 4px solid var(--accent);">
+            <h3>Agregar Tarjeta Manual</h3>
+            <div class="dynamic-row">
+                <input type="text" id="manual-clave" placeholder="Clave (Ej: C-101)">
+                <input type="text" id="manual-num" placeholder="Número">
             </div>
-            <button class="btn-main" style="background:#8e44ad;">+ Crear Pedido</button>
+            <div style="display:flex; gap:5px;">
+                <button class="btn-main" onclick="guardarTarjetaManual()">Guardar</button>
+                <button class="btn-clear" onclick="limpiarManual()">Limpiar</button>
+            </div>
+        </div>
+        <div class="card">
+            <h3>Carga Masiva (CSV)</h3>
+            <input type="file" id="csvInput">
+            <div style="display:flex; gap:5px;">
+                <button class="btn-main" onclick="uploadCSV()">Subir Archivo</button>
+                <button class="btn-clear" onclick="limpiarCSV()">Limpiar Archivo</button>
+            </div>
+        </div>
+        
+        <div class="card" style="background:#ffecec; border:1px solid red;">
+            <h3 style="color:red; margin-top:0;">⚠️ Zona de Peligro</h3>
+            <button class="btn-danger" onclick="eliminarDuplicadosZona()">🧹 ELIMINAR DUPLICADOS</button>
+            <button class="btn-danger" style="margin-top:10px; background:darkred;" onclick="borrarTodaLaZona()">🗑️ BORRAR TODA LA ZONA</button>
         </div>
 
         <div class="card">
-            <h3>Pedidos Activos</h3>
-            <div style="border-bottom:1px solid #eee; padding:10px 0;">
-                <div style="display:flex; justify-content:space-between;"><strong>Farmacia El Ahorro</strong> <span class="status-badge status-pending">Pendiente</span></div>
-                <small>Logotipo + Banner • L. 1,500</small>
+            <input type="text" id="search" placeholder="Buscar Clave o Número..." onkeyup="filtrar()">
+            <div style="max-height:400px; overflow-y:scroll; margin-top:10px;">
+                <table class="data-table" id="table-db">
+                    <thead><tr><th>Clave</th><th>#</th><th>Acción</th></tr></thead>
+                    <tbody id="db-body"></tbody>
+                </table>
             </div>
-            <div style="border-bottom:1px solid #eee; padding:10px 0;">
-                <div style="display:flex; justify-content:space-between;"><strong>Taller Juan</strong> <span class="status-badge status-paid">Pagado</span></div>
-                <small>Tarjetas • L. 500</small>
-            </div>
+        </div>
+    </div>
+    
+    <div id="view-dashboard" class="view-section">
+        <div class="card">
+            <div style="border-bottom:1px solid #eee; margin-bottom:15px; padding-bottom:10px;"><h3>Hola, <span id="dash-name"></span> 👋</h3><p style="margin:0;">Zona: <strong id="dash-zona"></strong></p><div style="margin-top:10px; background:#f0f0f0; padding:10px; border-radius:5px;"><label style="font-size:0.7em; font-weight:bold;">FILTRAR (Semana/Quincena)</label><div style="display:flex; gap:5px; margin-top:5px;"><div style="flex:1"><span class="lbl-small">Desde:</span><input type="date" id="dash-start" onchange="cargarDash()"></div><div style="flex:1"><span class="lbl-small">Hasta:</span><input type="date" id="dash-end" onchange="cargarDash()"></div></div></div></div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;"><div class="stat-box green"><span class="stat-num" id="kpi-cobradas">0 / 0</span><small>Cobradas</small></div><div class="stat-box blue"><span class="stat-num" id="kpi-com">L.0</span><small>Mi Comisión</small></div></div>
+            <div style="text-align:center; margin-bottom:20px;"><span style="font-size:2em; font-weight:bold; color:#333;" id="kpi-recaudo">L. 0.00</span><br><small>RECAUDADO</small></div>
+            <div class="chart-grid"><div class="chart-box"><canvas id="chartEfficiency"></canvas><div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); pointer-events:none;"><span id="chart-center-val" style="font-size:1.5em; font-weight:bold;">0%</span></div></div><div class="chart-box"><canvas id="chartMoney"></canvas></div></div>
+            <h4 style="margin-bottom:5px;">📝 Detalle</h4><div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>Fecha</th><th>Tarjetas</th><th>Recaudo</th><th>Comisión</th></tr></thead><tbody id="dash-history-body"></tbody></table></div>
         </div>
     </div>
 </div>
 
-<div id="app-flota" class="app-module">
-    <div class="container">
-        <header style="background: linear-gradient(135deg, #d35400 0%, #2c3e50 100%);">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="font-size: 1.8em;">🚛</div>
-                <div><h2 style="margin:0; font-size:1.1em;">CM CONTROL HN</h2><small>Flota & Mantenimiento</small></div>
-            </div>
-        </header>
+<div id="seccion-impresion">
+    <div class="pdf-header"><div><h1>COMERCIAL MILAGRO</h1><p id="p-semana-title" style="font-size:16px; font-weight:bold;"></p></div><div style="text-align:right;"><div>ZONA: <strong id="p-zona" style="font-size:16px; text-transform:uppercase;"></strong></div><div>FECHA: <span id="p-fecha"></span></div></div></div>
+    <div class="pdf-title">I. DETALLE INGRESOS</div><table class="pdf-table" id="p-tbl-tal"></table>
+    <div class="pdf-title">II. DETALLE EGRESOS Y BANCO</div><table class="pdf-table" id="p-tbl-gas"></table><table class="pdf-table" id="p-tbl-ban" style="margin-top:10px;"></table>
+    <div class="pdf-summary-container"><div style="text-align:center; font-weight:bold; border-bottom:1px solid #ccc; margin-bottom:10px;">LIQUIDACIÓN FINAL</div><div class="pdf-sum-row plus"><span>(+) TOTAL RECAUDADO</span><span id="p-rec">L. 0.00</span></div><div class="pdf-sum-row minus pdf-comision-box"><span>(-) COMISIÓN COBRADOR (10%)</span><span id="p-com">L. 0.00</span></div><div class="pdf-sum-row minus"><span>(-) TOTAL GASTOS</span><span id="p-gas">L. 0.00</span></div><div class="pdf-sum-row minus"><span>(-) TOTAL BANCO</span><span id="p-ban">L. 0.00</span></div><div class="pdf-neto-box">(=) NETO A ENTREGAR: <span id="p-neto">L. 0.00</span></div></div>
+    <div class="pdf-pressure-box"><b>EFICIENCIA DE COBRO:</b><br>Se cobraron <span id="p-cob" style="font-size:16px; font-weight:bold;">0</span> tarjetas de un total de <span id="p-tot">0</span> en ruta.<br>Tarjetas sin cobro: <span id="p-nocob" style="color:red; font-weight:bold;">0</span></div>
+    <div class="pdf-title" style="margin-top:20px;">IV. CONTROL DE INVENTARIO</div><div class="pdf-inv-grid"><div class="pdf-inv-item"><b id="p-sys">0</b>Base</div><div class="pdf-inv-item"><b id="p-new" style="color:green;">0</b>(+)Nuevas</div><div class="pdf-inv-item"><b id="p-baj" style="color:red;">0</b>(-)Cancel</div><div class="pdf-inv-item"><b id="p-recog" style="color:orange;">0</b>(-)Recog</div><div class="pdf-inv-item" style="background:#eee;"><b id="p-teo">0</b>Teórico</div><div class="pdf-inv-item" style="border:2px solid #333;"><b id="p-fis">0</b>Físico</div></div><div style="text-align:center; margin-top:5px; font-weight:bold;" id="p-msg"></div>
+    
+    <div class="pdf-title" style="margin-top:20px;">V. DETALLE DE TARJETAS RETIRADAS</div>
+    <div id="p-grid-bajas" class="pdf-compact-grid"></div>
 
-        <div class="card fleet-card">
-            <h3>Registro Combustible</h3>
-            <select><option>Toyota Runner 3.0</option><option>Moto Genesis 1</option></select>
-            <div class="dynamic-row" style="margin-top:5px;">
-                <input type="number" placeholder="Kilometraje Actual">
-                <input type="number" placeholder="Monto L.">
-            </div>
-            <input type="file" style="margin-top:5px;">
-            <button class="btn-main" style="background:#d35400;">Guardar Registro</button>
-        </div>
+    <div class="pdf-title" style="margin-top:20px;">VI. TARJETAS NUEVAS INGRESADAS</div>
+    <div id="p-grid-nuevas" class="pdf-compact-grid"></div>
 
-        <div class="card">
-            <h3>Próximos Mantenimientos</h3>
-            <div style="background:#ffecec; padding:10px; border-radius:5px; color:#c0392b; font-weight:bold;">
-                ⚠️ Cambio Aceite Runner (Faltan 500km)
-            </div>
-        </div>
-    </div>
+    <div class="pdf-evidence-section"><div id="p-gal-mixed"></div></div>
+    <div class="pdf-signatures"><div class="sign-line">Firma Cobrador</div><div class="sign-line">Firma Recibido</div></div>
 </div>
-
-<div id="printControls" style="display:none; position:fixed; top:0; left:0; width:100%; background:#2c3e50; padding:15px; justify-content:space-around; z-index:10000; box-shadow:0 4px 10px rgba(0,0,0,0.3);"><button onclick="cerrarVistaPrevia()" style="padding:10px 20px; border-radius:20px; font-weight:bold; border:none; background:#e74c3c; color:white;">❌ VOLVER</button><button onclick="window.print()" style="padding:10px 20px; border-radius:20px; font-weight:bold; border:none; background:#2ecc71; color:white;">🖨️ IMPRIMIR</button></div>
-<div id="conciliacionModal" class="modal-overlay"><div class="modal-content"><span class="close-modal" onclick="closeConciliacion()">×</span><div class="modal-header">⚠️ BAJA DE TARJETAS</div><p style="text-align:center;">Busca y elimina la tarjeta.</p><div style="background:#f9f9f9; padding:10px; border-radius:10px; text-align:center;"><small>Faltan por eliminar:</small><span class="modal-counter" id="cards-to-delete-count">0</span></div><div style="margin-top:15px;"><input type="text" id="modal-search" placeholder="Buscar..." onkeyup="searchForDeletion()" style="font-size:1.2em; text-align:center; margin-bottom:10px;"><div style="max-height:250px; overflow-y:scroll; border:1px solid #eee;"><table class="data-table"><thead><tr><th>Clave</th><th>#</th><th>Acción</th></tr></thead><tbody id="modal-table-body"></tbody></table></div></div></div></div>
-<div id="historyModal" class="modal-overlay"><div class="modal-content" style="max-width:700px;"><span class="close-modal" onclick="closeHistory()">×</span><div class="modal-header">📜 HISTORIAL</div><div style="max-height:400px; overflow-y:scroll;"><table class="data-table"><thead><tr><th>Fecha</th><th>Tarjeta</th><th>Acción</th><th>Usuario</th></tr></thead><tbody id="history-table-body"></tbody></table></div></div></div>
-
-<div id="seccion-impresion"><div class="pdf-header"><div><h1>COMERCIAL MILAGRO</h1><p id="p-semana-title" style="font-size:16px; font-weight:bold;"></p></div><div style="text-align:right;"><div>ZONA: <strong id="p-zona" style="font-size:16px; text-transform:uppercase;"></strong></div><div>FECHA: <span id="p-fecha"></span></div></div></div><div class="pdf-title">I. DETALLE INGRESOS</div><table class="pdf-table" id="p-tbl-tal"></table><div class="pdf-title">II. DETALLE EGRESOS Y BANCO</div><table class="pdf-table" id="p-tbl-gas"></table><table class="pdf-table" id="p-tbl-ban" style="margin-top:10px;"></table><div class="pdf-summary-container"><div style="text-align:center; font-weight:bold; border-bottom:1px solid #ccc; margin-bottom:10px;">LIQUIDACIÓN FINAL</div><div class="pdf-sum-row plus"><span>(+) TOTAL RECAUDADO</span><span id="p-rec">L. 0.00</span></div><div class="pdf-sum-row minus pdf-comision-box"><span>(-) COMISIÓN COBRADOR (10%)</span><span id="p-com">L. 0.00</span></div><div class="pdf-sum-row minus"><span>(-) TOTAL GASTOS</span><span id="p-gas">L. 0.00</span></div><div class="pdf-sum-row minus"><span>(-) TOTAL BANCO</span><span id="p-ban">L. 0.00</span></div><div class="pdf-neto-box">(=) NETO A ENTREGAR: <span id="p-neto">L. 0.00</span></div></div><div class="pdf-pressure-box"><b>EFICIENCIA DE COBRO:</b><br>Se cobraron <span id="p-cob" style="font-size:16px; font-weight:bold;">0</span> tarjetas de un total de <span id="p-tot">0</span> en ruta.<br>Tarjetas sin cobro: <span id="p-nocob" style="color:red; font-weight:bold;">0</span></div><div class="pdf-title" style="margin-top:20px;">IV. CONTROL DE INVENTARIO</div><div class="pdf-inv-grid"><div class="pdf-inv-item"><b id="p-sys">0</b>Base</div><div class="pdf-inv-item"><b id="p-new" style="color:green;">0</b>(+)Nuevas</div><div class="pdf-inv-item"><b id="p-baj" style="color:red;">0</b>(-)Cancel</div><div class="pdf-inv-item"><b id="p-recog" style="color:orange;">0</b>(-)Recog</div><div class="pdf-inv-item" style="background:#eee;"><b id="p-teo">0</b>Teórico</div><div class="pdf-inv-item" style="border:2px solid #333;"><b id="p-fis">0</b>Físico</div></div><div style="text-align:center; margin-top:5px; font-weight:bold;" id="p-msg"></div><div class="pdf-title" style="margin-top:20px;">V. DETALLE DE TARJETAS RETIRADAS</div><div id="p-grid-bajas" class="pdf-compact-grid"></div><div class="pdf-title" style="margin-top:20px;">VI. TARJETAS NUEVAS INGRESADAS</div><div id="p-grid-nuevas" class="pdf-compact-grid"></div><div class="pdf-evidence-section"><div id="p-gal-mixed"></div></div><div class="pdf-signatures"><div class="sign-line">Firma Cobrador</div><div class="sign-line">Firma Recibido</div></div></div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
@@ -370,17 +373,6 @@
     let allCardsCache = []; 
     let sessionNewCards = [];
 
-    // --- SWITCH DE APLICACIONES (NUEVO) ---
-    window.switchApp = (appId, btn) => {
-        // Ocultar todos los modulos
-        document.querySelectorAll('.app-module').forEach(el => el.classList.remove('active-module'));
-        // Mostrar el elegido
-        document.getElementById('app-' + appId).classList.add('active-module');
-        // Actualizar botones
-        document.querySelectorAll('.nav-pill').forEach(el => el.classList.remove('active'));
-        if(btn) btn.classList.add('active');
-    };
-
     window.addEventListener('load', async () => {
         const zBox = document.getElementById('zones-checkboxes');
         ZONAS.forEach(z => zBox.innerHTML += `<label class="zone-check"><input type="checkbox" value="${z}"> ${z}</label>`);
@@ -392,7 +384,7 @@
         document.getElementById('dash-start').value = firstDay.toISOString().split('T')[0];
         document.getElementById('dash-end').value = now.toISOString().split('T')[0];
         
-        // --- AUTO-CARGAR BORRADOR ---
+        // AUTO-CARGAR BORRADOR
         setTimeout(cargarBorrador, 1000);
         document.body.addEventListener('input', guardarBorrador);
         document.body.addEventListener('change', guardarBorrador);
@@ -400,7 +392,9 @@
 
     window.guardarBorrador = () => {
         if(!currentUser || currentUser.role !== 'admin') return;
-        document.querySelectorAll('input, select').forEach(i => { if(i.type !== 'checkbox' && i.type !== 'radio' && i.type !== 'file') i.setAttribute('value', i.value); });
+        document.querySelectorAll('input, select').forEach(i => {
+            if(i.type !== 'checkbox' && i.type !== 'radio' && i.type !== 'file') i.setAttribute('value', i.value);
+        });
         const borrador = {
             talonarios: document.getElementById('lista-talonarios').innerHTML,
             gastos: document.getElementById('lista-gastos').innerHTML,
@@ -472,7 +466,6 @@
         sessionStorage.setItem('gyg_user', JSON.stringify(user));
         document.getElementById('login-screen').style.display='none';
         document.getElementById('app-container').style.display='block';
-        document.getElementById('main-nav').style.display='flex'; // MOSTRAR BARRA SUPERIOR
         document.getElementById('user-display').innerText = user.username + (user.role==='admin'?' (Admin)':'');
 
         const sel = document.getElementById('zonaSelect'); sel.innerHTML="";
@@ -525,12 +518,53 @@
         } catch(e) { alert("Error: " + e.message); }
     };
 
-    window.guardarTarjetaManual = async () => { const k = document.getElementById('manual-clave').value.trim(); const n = document.getElementById('manual-num').value.trim(); const z = document.getElementById('zonaSelect').value; if(!k || !n) return alert("⚠️ FALTAN DATOS"); try { await addDoc(collection(db, "tarjetas_fisicas"), { zona: z, clave: k, numero: n }); await registrarLog(z, k, n, 'NUEVA'); alert("✅ Guardada"); window.limpiarManual(); cargarDatos(); } catch(e) { alert("Error: " + e.message); } };
+    window.guardarTarjetaManual = async () => {
+        const k = document.getElementById('manual-clave').value.trim();
+        const n = document.getElementById('manual-num').value.trim();
+        const z = document.getElementById('zonaSelect').value;
+        if(!k || !n) return alert("⚠️ FALTAN DATOS");
+        try {
+            await addDoc(collection(db, "tarjetas_fisicas"), { zona: z, clave: k, numero: n });
+            await registrarLog(z, k, n, 'NUEVA');
+            alert("✅ Guardada");
+            window.limpiarManual();
+            cargarDatos();
+        } catch(e) { alert("Error: " + e.message); }
+    };
     window.limpiarManual = () => { document.getElementById('manual-clave').value = ""; document.getElementById('manual-num').value = ""; };
     window.limpiarCSV = () => { document.getElementById('csvInput').value = ""; alert("Limpio"); };
-    window.delRow = async (id) => { if(!confirm("¿Eliminar?")) return; const card = allCardsCache.find(c => c.id === id); document.getElementById(`tr-${id}`).remove(); try { await deleteDoc(doc(db, "tarjetas_fisicas", id)); if(card) await registrarLog(card.zona, card.clave, card.numero, 'ELIMINADA MANUAL'); } catch(e) {} totalSys--; if(document.getElementById('total-sys')) document.getElementById('total-sys').innerText = totalSys; if(document.getElementById('db-total-count')) document.getElementById('db-total-count').innerText = totalSys; calc(); };
-    window.borrarTodaLaZona = async () => { const z = document.getElementById('zonaSelect').value; if(!confirm(`⚠️ ¿BORRAR TODAS las tarjetas de ${z}?`)) return; const showLoading = document.getElementById('loading-overlay'); showLoading.style.display = 'flex'; const q = query(collection(db, "tarjetas_fisicas"), where("zona", "==", z)); const snap = await getDocs(q); if(snap.empty) { showLoading.style.display = 'none'; return alert("Nada que borrar."); } const chunks = []; let batch = writeBatch(db); let count = 0; snap.forEach(doc => { batch.delete(doc.ref); count++; if(count >= 400) { chunks.push(batch.commit()); batch = writeBatch(db); count = 0; } }); if(count > 0) chunks.push(batch.commit()); await Promise.all(chunks); await registrarLog(z, 'TODAS', 'TODAS', 'ELIMINACIÓN MASIVA ZONA'); showLoading.style.display = 'none'; alert(`✅ Eliminadas ${snap.size}.`); cargarDatos(); };
-    window.eliminarDuplicadosZona = async () => { const z = document.getElementById('zonaSelect').value; if(!confirm(`¿Eliminar duplicados en ${z}?`)) return; const showLoading = document.getElementById('loading-overlay'); showLoading.style.display = 'flex'; const q = query(collection(db, "tarjetas_fisicas"), where("zona", "==", z)); const snap = await getDocs(q); if(snap.empty) { showLoading.style.display = 'none'; return alert("Zona vacía."); } let seen = new Set(); let duplicates = []; snap.forEach(doc => { const key = doc.data().clave.trim(); if (seen.has(key)) duplicates.push(doc.ref); else seen.add(key); }); if(duplicates.length === 0) { showLoading.style.display = 'none'; return alert("✅ Sin duplicados."); } const chunks = []; let batch = writeBatch(db); let count = 0; duplicates.forEach(ref => { batch.delete(ref); count++; if(count >= 400) { chunks.push(batch.commit()); batch = writeBatch(db); count = 0; } }); if(count > 0) chunks.push(batch.commit()); await Promise.all(chunks); showLoading.style.display = 'none'; alert(`✅ Eliminados ${duplicates.length}.`); cargarDatos(); };
+    window.delRow = async (id) => {
+        if(!confirm("¿Eliminar?")) return;
+        const card = allCardsCache.find(c => c.id === id);
+        document.getElementById(`tr-${id}`).remove(); 
+        try { await deleteDoc(doc(db, "tarjetas_fisicas", id)); if(card) await registrarLog(card.zona, card.clave, card.numero, 'ELIMINADA MANUAL'); } catch(e) {}
+        totalSys--; if(document.getElementById('total-sys')) document.getElementById('total-sys').innerText = totalSys; if(document.getElementById('db-total-count')) document.getElementById('db-total-count').innerText = totalSys; calc();
+    };
+    window.borrarTodaLaZona = async () => {
+        const z = document.getElementById('zonaSelect').value;
+        if(!confirm(`⚠️ ¿BORRAR TODAS las tarjetas de ${z}?`)) return;
+        const showLoading = document.getElementById('loading-overlay'); showLoading.style.display = 'flex';
+        const q = query(collection(db, "tarjetas_fisicas"), where("zona", "==", z)); const snap = await getDocs(q);
+        if(snap.empty) { showLoading.style.display = 'none'; return alert("Nada que borrar."); }
+        const chunks = []; let batch = writeBatch(db); let count = 0;
+        snap.forEach(doc => { batch.delete(doc.ref); count++; if(count >= 400) { chunks.push(batch.commit()); batch = writeBatch(db); count = 0; } });
+        if(count > 0) chunks.push(batch.commit()); await Promise.all(chunks);
+        await registrarLog(z, 'TODAS', 'TODAS', 'ELIMINACIÓN MASIVA ZONA');
+        showLoading.style.display = 'none'; alert(`✅ Eliminadas ${snap.size}.`); cargarDatos();
+    };
+    window.eliminarDuplicadosZona = async () => {
+        const z = document.getElementById('zonaSelect').value;
+        if(!confirm(`¿Eliminar duplicados en ${z}?`)) return;
+        const showLoading = document.getElementById('loading-overlay'); showLoading.style.display = 'flex';
+        const q = query(collection(db, "tarjetas_fisicas"), where("zona", "==", z)); const snap = await getDocs(q);
+        if(snap.empty) { showLoading.style.display = 'none'; return alert("Zona vacía."); }
+        let seen = new Set(); let duplicates = [];
+        snap.forEach(doc => { const key = doc.data().clave.trim(); if (seen.has(key)) duplicates.push(doc.ref); else seen.add(key); });
+        if(duplicates.length === 0) { showLoading.style.display = 'none'; return alert("✅ Sin duplicados."); }
+        const chunks = []; let batch = writeBatch(db); let count = 0;
+        duplicates.forEach(ref => { batch.delete(ref); count++; if(count >= 400) { chunks.push(batch.commit()); batch = writeBatch(db); count = 0; } });
+        if(count > 0) chunks.push(batch.commit()); await Promise.all(chunks); showLoading.style.display = 'none'; alert(`✅ Eliminados ${duplicates.length}.`); cargarDatos();
+    };
     async function cargarDatos() { const z = document.getElementById('zonaSelect').value; const q = query(collection(db,"tarjetas_fisicas"), where("zona","==",z)); const snap = await getDocs(q); totalSys = snap.size; allCardsCache = []; snap.forEach(d => { allCardsCache.push({ id: d.id, ...d.data() }); }); if(document.getElementById('total-sys')) document.getElementById('total-sys').innerText=totalSys; if(document.getElementById('db-total-count')) document.getElementById('db-total-count').innerText=totalSys; if(currentUser.role==='admin') { const tbody = document.getElementById('db-body'); tbody.innerHTML=""; allCardsCache.forEach(d => { tbody.innerHTML += `<tr id="tr-${d.id}"><td>${d.clave}</td><td>${d.numero}</td><td><button class="btn-del-row" onclick="delRow('${d.id}')">Borrar</button></td></tr>`; }); } calc(); }
     window.filtrar = () => { const q = document.getElementById('search').value.toLowerCase(); const rows = document.querySelectorAll('#db-body tr'); rows.forEach(r => { const txt = r.innerText.toLowerCase(); r.style.display = txt.includes(q) ? '' : 'none'; }); };
     window.openConciliacion = () => { document.getElementById('conciliacionModal').style.display = 'flex'; document.getElementById('cards-to-delete-count').innerText = toDeleteCount; renderModalTable(allCardsCache); }
