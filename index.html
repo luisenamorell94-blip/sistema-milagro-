@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sistema Milagro | v47 Final</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
+    <title>Sistema Milagro | Auto-Update v48</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -19,7 +23,6 @@
         body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; margin: 0; padding: 10px; padding-bottom: 80px; -webkit-tap-highlight-color: transparent; }
         .container { max-width: 900px; margin: 0 auto; }
         
-        /* LOGIN */
         #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #2c3e50; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; }
         .login-box { background: white; padding: 40px 30px; border-radius: 15px; width: 90%; max-width: 340px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
         .cm-logo { font-size: 3em; font-weight: 900; color: var(--primary); border: 4px solid var(--primary); padding: 10px; border-radius: 10px; display: inline-block; margin-bottom: 20px; letter-spacing: -2px; }
@@ -48,7 +51,6 @@
         .bg-wait { background: #fcf3cf; color: #f39c12; }
         .btn-pay { background: var(--blue); color: white; border: none; padding: 8px 15px; border-radius: 20px; font-weight: bold; cursor: pointer; }
 
-        /* GENERAL INPUTS */
         .item-container { border: 1px solid #eee; background: #fafafa; padding: 8px; margin-bottom: 8px; border-radius: 6px; }
         .dynamic-row { display: flex; gap: 5px; margin-bottom: 5px; }
         input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 0.9em; }
@@ -397,6 +399,10 @@
     import { getFirestore, collection, addDoc, getDocs, query, where, deleteDoc, doc, orderBy, limit, writeBatch, updateDoc } 
     from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
+    // --- CODIGO DE VERSION PARA AUTO-UPDATE (SOLO CAMBIA ESTO) ---
+    const VERSION_ACTUAL = "48.0"; 
+    // -------------------------------------------------------------
+
     const firebaseConfig = { apiKey: "AIzaSyAXqQgW1goVNrNUVo6DSBBI9mutO4jvgqU", authDomain: "sistema-inventario-tarjetas.firebaseapp.com", projectId: "sistema-inventario-tarjetas", storageBucket: "sistema-inventario-tarjetas.firebasestorage.app", messagingSenderId: "44500678697", appId: "1:44500678697:web:c8559caa8e66a293d4c438", measurementId: "G-8W1DYQP0G3" };
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
@@ -411,7 +417,23 @@
     let currentPayId = null;
     let rutaCards = [];
 
+    // --- LOGICA DE AUTO-UPDATE ---
+    const checkVersion = () => {
+        const storedVer = localStorage.getItem('milagro_version');
+        if (storedVer !== VERSION_ACTUAL) {
+            localStorage.setItem('milagro_version', VERSION_ACTUAL);
+            // Force reload dropping cache
+            if (window.location.search.indexOf('v=') === -1) {
+                window.location.href = window.location.pathname + '?v=' + VERSION_ACTUAL;
+            } else {
+                window.location.reload(true);
+            }
+        }
+    };
+
     window.addEventListener('load', async () => {
+        checkVersion(); // Run update check
+        
         const zBox = document.getElementById('zones-checkboxes');
         ZONAS.forEach(z => zBox.innerHTML += `<label class="zone-check"><input type="checkbox" value="${z}"> ${z}</label>`);
         const saved = JSON.parse(sessionStorage.getItem('gyg_user'));
@@ -596,15 +618,13 @@
         const list = document.getElementById('lista-ruta-container');
         list.innerHTML = "<div style='text-align:center; padding:20px;'>Cargando...</div>";
 
-        // Query simple: Traer todas las tarjetas de la zona
         const q = query(collection(db, "tarjetas_fisicas"), where("zona", "==", z));
         const snap = await getDocs(q);
         
         let rutaCards = [];
         snap.forEach(d => rutaCards.push({ id: d.id, ...d.data() }));
-        rutaCards.sort((a,b) => a.clave.localeCompare(b.clave)); // Ordenar por Clave
+        rutaCards.sort((a,b) => a.clave.localeCompare(b.clave));
 
-        // ACTUALIZAR CONTADOR HEADER
         document.getElementById('ruta-total-cards').innerText = `Total: ${rutaCards.length}`;
 
         list.innerHTML = "";
@@ -677,7 +697,7 @@
 
             alert("✅ Pago registrado");
             closeAbono();
-            cargarRuta(); // Refrescar lista para verla verde
+            cargarRuta(); 
         } catch(e) {
             alert("Error: " + e.message);
         }
