@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comercial El Milagro - Sistema Oficial</title>
-    
+    <title>Comercial El Milagro - Sistema Cloud</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
         :root { 
             --primary: #004d40; --secondary: #00796b; --field-color: #e65100;
@@ -71,6 +72,7 @@
             .report-section { box-shadow: none; border: 1px solid #ddd; border-top-width: 5px; }
             body { background: white; }
             .grand-total-box { background-color: #222 !important; color: white !important; }
+            /* Asegurar colores de fondo en Chrome */
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         }
         @media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } .full-width { grid-column: span 1; } }
@@ -126,10 +128,11 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-    // --- TUS CREDENCIALES ---
+    // --- TUS CREDENCIALES (YA CON EL URL CORREGIDO) ---
     const firebaseConfig = {
       apiKey: "AIzaSyAYJRmMQbV-j6hGfHCZyuCgtvmkY0C2L1g",
       authDomain: "ingreso-depositos.firebaseapp.com",
+      databaseURL: "https://ingreso-depositos-default-rtdb.firebaseio.com",
       projectId: "ingreso-depositos",
       storageBucket: "ingreso-depositos.firebasestorage.app",
       messagingSenderId: "788432921819",
@@ -137,12 +140,14 @@
       measurementId: "G-2VR37Z1MQL"
     };
 
+    // INICIALIZAR APP
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const registrosRef = ref(db, 'registros_milagro'); // Carpeta en la nube
 
     let registrosLocales = [];
 
+    // ESCUCHAR DATOS (SIEMPRE ACTIVO)
     onValue(registrosRef, (snapshot) => {
         const data = snapshot.val();
         registrosLocales = [];
@@ -151,12 +156,17 @@
                 registrosLocales.push({ idFirebase: key, ...data[key] });
             });
         }
+        
+        // PINTAR PANTALLA
         if (window.pintarHTML) window.pintarHTML(registrosLocales);
+        
+        // AVISAR CONEXIÓN
         const status = document.getElementById('status-bar');
         status.innerText = "🟢 Conectado y Sincronizado";
         status.classList.add('online');
     });
 
+    // FUNCIÓN GUARDAR (EXPORTADA A WINDOW PARA QUE EL BOTÓN LA VEA)
     window.guardarEnFirebase = function() {
         const semana = document.getElementById('semana').value;
         const fecha = document.getElementById('fecha').value;
@@ -174,15 +184,18 @@
             return; 
         }
 
+        // ENVIAR
         push(registrosRef, { origen: window.MODO_ACTUAL, semana, fecha, ref: refNum, zona, cobrador, cuenta, monto })
         .then(() => {
             document.getElementById('monto').value = "";
             document.getElementById('referencia').value = "";
             document.getElementById('referencia').focus();
+            // No necesitamos alert porque la tabla se actualiza sola
         })
-        .catch(err => alert("Error: " + err.message));
+        .catch(err => alert("Error al guardar: " + err.message));
     }
     
+    // FUNCIÓN BORRAR
     window.eliminarDeNube = function(id) {
         if(confirm("¿Borrar permanentemente este registro de la nube?")) {
             remove(ref(db, `registros_milagro/${id}`));
@@ -191,6 +204,7 @@
 </script>
 
 <script>
+    // CONFIGURACIÓN LOCAL
     const rutas = {
         "MIGUEL": ["Elixir", "Saba Olanchito", "Zona Saba"],
         "ANGEL": ["Margen Izquierda", "Saba Tocoa"],
@@ -207,12 +221,14 @@
 
     window.MODO_ACTUAL = 'OFICINA';
 
+    // AL INICIAR
     window.onload = function() {
         document.getElementById('fecha').valueAsDate = new Date();
         cargarZonasEnSelect();
         actualizarSelectCuentas();
     };
 
+    // CAMBIO DE PESTAÑAS
     window.cambiarModo = function(modo) {
         window.MODO_ACTUAL = modo;
         const tabOficina = document.getElementById('tab-btn-oficina');
@@ -220,6 +236,7 @@
         const indicador = document.getElementById('indicador-modo');
         const boton = document.getElementById('btn-accion');
 
+        // Reset
         tabOficina.className = 'tab'; tabCampo.className = 'tab';
         indicador.className = 'mode-indicator'; boton.className = 'btn-save';
 
@@ -235,6 +252,7 @@
         actualizarSelectCuentas();
     }
 
+    // LISTAS DESPLEGABLES
     window.actualizarSelectCuentas = function() {
         const select = document.getElementById('cuenta');
         select.innerHTML = "";
@@ -269,6 +287,7 @@
         document.getElementById('cobrador').value = opcion && opcion.value ? opcion.getAttribute('data-cobrador') : "";
     }
 
+    // PINTAR EL REPORTE (LLAMADO DESDE EL MODULE CUANDO HAY DATOS)
     window.pintarHTML = function(listaRegistros) {
         const contenedor = document.getElementById('contenedor-reportes');
         contenedor.innerHTML = ""; 
@@ -313,6 +332,7 @@
                 });
                 granTotal += subtotalCuenta;
 
+                // Resumen Zona
                 let resumenZonaHTML = `<div class="zone-summary-box"><div class="zone-summary-title">Resumen por Zona (${config.titulo})</div>`;
                 Object.keys(totalesPorZona).sort().forEach(zona => {
                     resumenZonaHTML += `
