@@ -3,111 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comercial El Milagro - Sistema v3.0</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <title>Comercial GYG - Sistema Integrado</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <style>
-        :root { 
-            --primary: #004d40; --secondary: #00796b; --field-color: #e65100;
-            --edit: #1976d2; --error: #d32f2f;
-        }
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 0; padding-bottom: 60px;}
-        header { background-color: var(--primary); color: white; padding: 10px; text-align: center; }
-        .version-tag { background: red; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
+        /* TU DISEÑO CLÁSICO */
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f4f4; margin: 0; padding: 10px; padding-bottom: 60px;}
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         
-        .container { max-width: 950px; margin: 0 auto; padding: 10px; }
+        h2 { text-align: center; color: #333; margin-top: 0; border-bottom: 2px solid #004d40; padding-bottom: 10px; }
         
-        /* TABS */
-        .tabs { display: flex; cursor: pointer; }
-        .tab { flex: 1; padding: 15px; text-align: center; font-weight: bold; background: #ccc; color: #555; border-radius: 10px 10px 0 0; }
-        .tab.active { background: white; color: var(--primary); border-bottom: 3px solid var(--primary); }
-        .tab.active-campo { background: white; color: var(--field-color); border-bottom: 3px solid var(--field-color); }
+        /* PESTAÑAS */
+        .tabs { display: flex; gap: 5px; margin-bottom: 15px; }
+        .tab { flex: 1; padding: 12px; text-align: center; cursor: pointer; font-weight: bold; background: #e0e0e0; color: #555; border-radius: 5px; transition: 0.3s; }
+        
+        .active-oficina { background: #004d40; color: white; } /* Verde */
+        .active-campo { background: #e65100; color: white; }   /* Naranja */
+        .active-contado { background: #4a148c; color: white; } /* Morado (NUEVO) */
 
-        .card { background: white; padding: 20px; border-radius: 0 0 10px 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .full-width { grid-column: span 3; }
+        /* FORMULARIO */
+        label { display: block; margin-top: 10px; font-weight: bold; font-size: 0.9rem; color: #333; }
+        input, select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
         
-        select, input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        label { font-size: 0.8rem; font-weight: bold; color: #555; display: block; margin-top: 5px;}
-
         /* BOTONES */
-        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
-        .btn-save { flex: 1; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; }
-        .btn-oficina { background-color: var(--secondary); }
-        .btn-campo { background-color: var(--field-color); }
-        
-        .btn-actualizar { background-color: var(--edit) !important; animation: parpadeo 2s infinite; }
-        .btn-cancelar { background-color: #757575; color: white; border: none; padding: 12px; border-radius: 5px; font-weight: bold; cursor: pointer; display: none; }
-        @keyframes parpadeo { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
+        button { width: 100%; padding: 15px; margin-top: 20px; border: none; border-radius: 5px; font-weight: bold; color: white; font-size: 1rem; cursor: pointer; }
+        .btn-verde { background: #004d40; }
+        .btn-naranja { background: #e65100; }
+        .btn-morado { background: #4a148c; }
+        .btn-cancelar { background: #d32f2f; display: none; margin-top: 10px; }
 
-        /* TABLA Y BOTONES DE ACCIÓN */
-        table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
-        th, td { padding: 6px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background-color: #f0f0f0; }
+        /* TABLA */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9rem; }
+        th { background: #eee; padding: 10px; text-align: left; border-bottom: 2px solid #ddd; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
         
-        .btn-action { border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 1rem; margin-right: 5px; }
-        .btn-edit { background: #e3f2fd; color: var(--edit); } 
-        .btn-delete { background: #ffebee; color: var(--error); }
-
-        /* Reportes */
-        .report-section { background: white; border-radius: 8px; padding: 10px; margin-bottom: 15px; border-top: 5px solid #555; }
-        .border-david { border-top-color: #0d47a1; }
-        .border-lesly { border-top-color: #880e4f; }
-        .border-jose { border-top-color: #1b5e20; }
-        .border-mix { border-top-color: #4a148c; }
-        
-        .account-title { margin: 0; padding-bottom: 5px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
-        
-        #status-bar { text-align: center; padding: 5px; font-size: 0.8rem; background: #333; color: white; }
-        .online { background: #2e7d32 !important; }
-
-        @media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } .full-width { grid-column: span 1; } }
-        @media print { .no-print, .tabs, .card, #status-bar { display: none !important; } body { background: white; } }
+        /* OCULTAR ELEMENTOS */
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-<div id="status-bar">Conectando...</div>
-
-<header>
-    <h1>COMERCIAL EL MILAGRO</h1>
-    <span class="version-tag">VERSIÓN 3.0 (CON EDICIÓN)</span>
-</header>
-
 <div class="container">
+    <h2 id="titulo-sistema">SISTEMA COMERCIAL GYG</h2>
+
     <div class="tabs">
-        <div class="tab active" id="tab-btn-oficina" onclick="setModo('OFICINA')">🏢 OFICINA</div>
-        <div class="tab" id="tab-btn-campo" onclick="setModo('CAMPO')">🏍️ VENDEDORES</div>
+        <div id="tab-oficina" class="tab active-oficina" onclick="cambiarModo('OFICINA')">🏢 OFICINA</div>
+        <div id="tab-campo" class="tab" onclick="cambiarModo('CAMPO')">🏍️ CAMPO</div>
+        <div id="tab-contado" class="tab" onclick="cambiarModo('CONTADO')">📦 CONTADO</div>
     </div>
 
-    <div class="card">
-        <div class="form-grid">
-            <div><label>Semana</label><select id="semana"><option>Semana 1</option><option>Semana 2</option><option>Semana 3</option><option>Semana 4</option><option>Semana 5</option></select></div>
-            <div><label>Fecha</label><input type="date" id="fecha"></div>
-            <div><label>Referencia</label><input type="number" id="referencia"></div>
-            <div class="full-width"><label>Zona</label><select id="zona" onchange="autoCobrador()"></select></div>
-            <div class="full-width"><label>Cobrador</label><input type="text" id="cobrador" readonly style="background:#eee;"></div>
-            <div class="full-width"><label>Cuenta</label><select id="cuenta"></select></div>
-            <div class="full-width"><label>Monto</label><input type="number" id="monto"></div>
+    <div style="background: #fafafa; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
+        <label>Fecha:</label>
+        <input type="date" id="fecha">
+
+        <div id="bloque-depositos">
+            <label>Semana:</label>
+            <select id="semana"><option>Semana 1</option><option>Semana 2</option><option>Semana 3</option><option>Semana 4</option><option>Semana 5</option></select>
+            
+            <label>Referencia:</label>
+            <input type="number" id="referencia" placeholder="Número de recibo">
+            
+            <label>Zona:</label>
+            <select id="zona" onchange="autoCobrador()"></select>
+            
+            <label>Cobrador:</label>
+            <input type="text" id="cobrador" readonly style="background:#e9e9e9;">
+            
+            <label>Cuenta Destino:</label>
+            <select id="cuenta"></select>
         </div>
-        <div class="btn-group">
-            <button id="btn-cancelar" class="btn-cancelar" onclick="cancelar()">CANCELAR</button>
-            <button id="btn-save" class="btn-save btn-oficina" onclick="guardar()">GUARDAR EN NUBE</button>
+
+        <div id="bloque-contado" class="hidden">
+            <label>Vendedor:</label>
+            <select id="vendedor">
+                <option value="">-- Seleccione --</option>
+                <option value="SANTOS">Santos</option>
+                <option value="NOE">Noé</option>
+                <option value="CARLOS">Carlos</option>
+                <option value="RAMON">Ramón</option>
+                <option value="ORLANDO">Orlando</option>
+                <option value="DAVID">David</option>
+            </select>
+
+            <label>Artículo:</label>
+            <input type="text" id="articulo" placeholder="Ej: Cama, Estufa, Juego de Sala...">
         </div>
+
+        <label id="lbl-monto">Monto (L.):</label>
+        <input type="number" id="monto" placeholder="0.00">
+
+        <button id="btn-guardar" class="btn-verde" onclick="guardar()">GUARDAR REGISTRO</button>
+        <button id="btn-cancelar" class="btn-cancelar" onclick="cancelar()">CANCELAR EDICIÓN</button>
     </div>
 
-    <div id="reportes"></div>
-    <div style="background:#222; color:white; padding:10px; text-align:right; font-weight:bold; margin-top:10px;">TOTAL: <span id="gran-total">L. 0.00</span></div>
+    <h3 id="titulo-tabla">Registros Recientes</h3>
+    <div style="overflow-x:auto;">
+        <table>
+            <thead id="tabla-head"></thead>
+            <tbody id="tabla-body"></tbody>
+        </table>
+    </div>
     
-    <br>
-    <button onclick="window.print()" class="btn-save no-print" style="background:#d32f2f;">📄 IMPRIMIR PDF</button>
+    <div style="text-align:right; font-size:1.2rem; font-weight:bold; margin-top:15px; padding:10px; background:#333; color:white;">
+        TOTAL: <span id="total-global">L. 0.00</span>
+    </div>
 </div>
 
 <script>
-    // --- 1. CONFIGURACIÓN FIREBASE (CLÁSICA) ---
+    // 1. CONFIGURACIÓN
     const firebaseConfig = {
       apiKey: "AIzaSyAYJRmMQbV-j6hGfHCZyuCgtvmkY0C2L1g",
       authDomain: "ingreso-depositos.firebaseapp.com",
@@ -117,17 +122,15 @@
       messagingSenderId: "788432921819",
       appId: "1:788432921819:web:b5f792eecbe4b7b00498fe"
     };
-    
-    // Inicializar directo (sin módulos)
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-    const refMilagro = db.ref('registros_milagro');
 
-    // --- 2. VARIABLES Y DATOS ---
-    let registros = [];
+    // 2. VARIABLES
     let MODO = 'OFICINA';
     let ID_EDITANDO = null;
-
+    let listaDep = []; // Para depositos
+    let listaCon = []; // Para contado
+    
     const rutas = {
         "MIGUEL": ["Elixir", "Saba Olanchito", "Zona Saba"],
         "ANGEL": ["Margen Izquierda", "Saba Tocoa"],
@@ -136,194 +139,217 @@
         "JORGE": ["Planes", "Jutiapa", "Sonaguera", "Faust"]
     };
 
-    // --- 3. INICIO ---
+    // 3. INICIO
     window.onload = function() {
         document.getElementById('fecha').valueAsDate = new Date();
-        llenarSelects();
-        setModo('OFICINA');
+        llenarZonas();
+        actualizarCuentas();
         
-        // Escuchar Firebase
-        refMilagro.on('value', (snapshot) => {
-            const data = snapshot.val();
-            registros = [];
-            if(data) {
-                Object.keys(data).forEach(k => registros.push({ id: k, ...data[k] }));
-            }
-            pintarTabla();
-            document.getElementById('status-bar').innerText = "🟢 CONECTADO (v3.0)";
-            document.getElementById('status-bar').classList.add('online');
+        // Cargar Depositos
+        db.ref('registros_milagro').on('value', snap => {
+            listaDep = [];
+            if(snap.val()) Object.keys(snap.val()).forEach(k => listaDep.push({id:k, ...snap.val()[k]}));
+            actualizarTabla();
+        });
+
+        // Cargar Contado
+        db.ref('ventas_contado').on('value', snap => {
+            listaCon = [];
+            if(snap.val()) Object.keys(snap.val()).forEach(k => listaCon.push({id:k, ...snap.val()[k]}));
+            actualizarTabla();
         });
     };
 
-    // --- 4. FUNCIONES LOGICAS ---
-    window.guardar = function() {
-        const data = {
-            origen: MODO,
-            semana: getValue('semana'),
-            fecha: getValue('fecha'),
-            ref: getValue('referencia'),
-            zona: getValue('zona'),
-            cobrador: getValue('cobrador'),
-            cuenta: getValue('cuenta'),
-            monto: parseFloat(getValue('monto'))
-        };
+    // 4. CAMBIAR PESTAÑA (LÓGICA VISUAL)
+    window.cambiarModo = function(modo) {
+        MODO = modo;
+        cancelar(); // Limpiar todo al cambiar
 
-        if(!data.zona || !data.cobrador || !data.ref || isNaN(data.monto)) {
-            alert("⚠️ Faltan datos"); return;
+        // Resetear botones
+        document.getElementById('tab-oficina').className = 'tab';
+        document.getElementById('tab-campo').className = 'tab';
+        document.getElementById('tab-contado').className = 'tab';
+        
+        const btn = document.getElementById('btn-guardar');
+        const blqDep = document.getElementById('bloque-depositos');
+        const blqCon = document.getElementById('bloque-contado');
+        const lblMonto = document.getElementById('lbl-monto');
+
+        if(modo === 'OFICINA') {
+            document.getElementById('tab-oficina').className = 'tab active-oficina';
+            blqDep.style.display = 'block'; blqCon.style.display = 'none';
+            btn.className = 'btn-verde'; btn.innerText = "GUARDAR (OFICINA)";
+            lblMonto.innerText = "Monto Depósito (L.):";
+        } 
+        else if(modo === 'CAMPO') {
+            document.getElementById('tab-campo').className = 'tab active-campo';
+            blqDep.style.display = 'block'; blqCon.style.display = 'none';
+            btn.className = 'btn-naranja'; btn.innerText = "GUARDAR (CAMPO)";
+            lblMonto.innerText = "Monto Depósito (L.):";
+        } 
+        else { // CONTADO
+            document.getElementById('tab-contado').className = 'tab active-contado';
+            blqDep.style.display = 'none'; blqCon.style.display = 'block';
+            btn.className = 'btn-morado'; btn.innerText = "GUARDAR VENTA CONTADO";
+            lblMonto.innerText = "Saldo Contado (L.):";
+        }
+        
+        actualizarCuentas();
+        actualizarTabla();
+    };
+
+    // 5. GUARDAR
+    window.guardar = function() {
+        const fecha = document.getElementById('fecha').value;
+        const monto = parseFloat(document.getElementById('monto').value);
+
+        if(isNaN(monto)) { alert("Falta el monto"); return; }
+
+        let ruta = '';
+        let datos = {};
+
+        if(MODO === 'CONTADO') {
+            const vend = document.getElementById('vendedor').value;
+            const art = document.getElementById('articulo').value;
+            if(!vend || !art) { alert("Falta vendedor o artículo"); return; }
+            
+            ruta = 'ventas_contado';
+            datos = { fecha, vendedor: vend, articulo: art, monto };
+        } else {
+            const sem = document.getElementById('semana').value;
+            const ref = document.getElementById('referencia').value;
+            const zon = document.getElementById('zona').value;
+            const cob = document.getElementById('cobrador').value;
+            const cue = document.getElementById('cuenta').value;
+            if(!zon || !ref) { alert("Falta zona o referencia"); return; }
+            
+            ruta = 'registros_milagro';
+            datos = { origen: MODO, semana: sem, fecha, ref, zona: zon, cobrador: cob, cuenta: cue, monto };
         }
 
         if(ID_EDITANDO) {
-            // ACTUALIZAR
-            db.ref('registros_milagro/' + ID_EDITANDO).update(data)
-            .then(() => { alert("✅ Editado"); cancelar(); });
+            db.ref(ruta + '/' + ID_EDITANDO).update(datos).then(() => { alert("Actualizado"); cancelar(); });
         } else {
-            // NUEVO
-            const existe = registros.find(r => r.ref == data.ref);
-            if(existe) { alert("⛔ Referencia Repetida"); return; }
-            
-            refMilagro.push(data).then(() => {
-                document.getElementById('referencia').value = "";
+            db.ref(ruta).push(datos).then(() => { 
                 document.getElementById('monto').value = "";
-                document.getElementById('referencia').focus();
+                document.getElementById('referencia').value = "";
+                document.getElementById('articulo').value = "";
+                alert("Guardado");
             });
         }
     };
 
+    // 6. TABLA
+    function actualizarTabla() {
+        const tbody = document.getElementById('tabla-body');
+        const thead = document.getElementById('tabla-head');
+        tbody.innerHTML = "";
+        let total = 0;
+
+        if(MODO === 'CONTADO') {
+            thead.innerHTML = `<tr><th>Fecha</th><th>Vendedor</th><th>Artículo</th><th>Saldo</th><th></th></tr>`;
+            
+            listaCon.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+            listaCon.forEach(r => {
+                total += r.monto;
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${r.fecha}</td>
+                        <td><b>${r.vendedor}</b></td>
+                        <td>${r.articulo}</td>
+                        <td style="color:#4a148c; font-weight:bold;">L. ${r.monto}</td>
+                        <td>
+                            <button style="padding:5px; width:auto; margin:0; background:#2196F3" onclick="editar('${r.id}')">✏️</button>
+                            <button style="padding:5px; width:auto; margin:0; background:#d32f2f" onclick="borrar('${r.id}')">🗑️</button>
+                        </td>
+                    </tr>`;
+            });
+        } else {
+            thead.innerHTML = `<tr><th>Fecha</th><th>Zona / Ref</th><th>Monto</th><th></th></tr>`;
+            
+            listaDep.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+            listaDep.forEach(r => {
+                total += r.monto;
+                let color = r.origen === 'OFICINA' ? '#004d40' : '#e65100';
+                tbody.innerHTML += `
+                    <tr style="border-left: 5px solid ${color}">
+                        <td>${r.fecha}</td>
+                        <td>${r.zona}<br><small>Ref: ${r.ref}</small></td>
+                        <td style="font-weight:bold;">L. ${r.monto}</td>
+                        <td>
+                            <button style="padding:5px; width:auto; margin:0; background:#2196F3" onclick="editar('${r.id}')">✏️</button>
+                            <button style="padding:5px; width:auto; margin:0; background:#d32f2f" onclick="borrar('${r.id}')">🗑️</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+        document.getElementById('total-global').innerText = "L. " + total.toLocaleString();
+    }
+
+    // 7. FUNCIONES EXTRA
     window.borrar = function(id) {
-        if(confirm("¿Eliminar registro?")) db.ref('registros_milagro/' + id).remove();
-    };
+        if(confirm("¿Borrar registro?")) {
+            let ruta = MODO === 'CONTADO' ? 'ventas_contado' : 'registros_milagro';
+            db.ref(ruta + '/' + id).remove();
+        }
+    }
 
     window.editar = function(id) {
-        const r = registros.find(x => x.id === id);
-        if(!r) return;
-        
-        setModo(r.origen);
-        
-        document.getElementById('semana').value = r.semana;
-        document.getElementById('fecha').value = r.fecha;
-        document.getElementById('referencia').value = r.ref;
-        document.getElementById('zona').value = r.zona;
-        document.getElementById('cobrador').value = r.cobrador;
-        document.getElementById('cuenta').value = r.cuenta;
-        document.getElementById('monto').value = r.monto;
-
         ID_EDITANDO = id;
-        
-        // Cambio visual
-        const btn = document.getElementById('btn-save');
-        btn.innerText = "ACTUALIZAR REGISTRO";
-        btn.classList.add('btn-actualizar');
         document.getElementById('btn-cancelar').style.display = 'block';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
+        document.getElementById('btn-guardar').innerText = "ACTUALIZAR DATOS";
+        window.scrollTo(0,0);
+
+        if(MODO === 'CONTADO') {
+            let r = listaCon.find(x => x.id === id);
+            document.getElementById('fecha').value = r.fecha;
+            document.getElementById('vendedor').value = r.vendedor;
+            document.getElementById('articulo').value = r.articulo;
+            document.getElementById('monto').value = r.monto;
+        } else {
+            let r = listaDep.find(x => x.id === id);
+            document.getElementById('fecha').value = r.fecha;
+            document.getElementById('semana').value = r.semana;
+            document.getElementById('referencia').value = r.ref;
+            document.getElementById('zona').value = r.zona;
+            autoCobrador();
+            document.getElementById('cuenta').value = r.cuenta;
+            document.getElementById('monto').value = r.monto;
+        }
+    }
 
     window.cancelar = function() {
         ID_EDITANDO = null;
-        document.getElementById('referencia').value = "";
-        document.getElementById('monto').value = "";
         document.getElementById('btn-cancelar').style.display = 'none';
-        const btn = document.getElementById('btn-save');
-        btn.innerText = MODO === 'OFICINA' ? "GUARDAR EN NUBE" : "SUBIR BAUCHER";
-        btn.classList.remove('btn-actualizar');
-    };
+        document.getElementById('monto').value = "";
+        document.getElementById('articulo').value = "";
+        document.getElementById('referencia').value = "";
+        if(MODO === 'CONTADO') document.getElementById('btn-guardar').innerText = "GUARDAR VENTA CONTADO";
+        else document.getElementById('btn-guardar').innerText = "GUARDAR (" + MODO + ")";
+    }
 
-    // --- 5. UI HELPER FUNCTIONS ---
-    function getValue(id) { return document.getElementById(id).value; }
-
-    window.setModo = function(m) {
-        MODO = m;
-        const btn = document.getElementById('btn-save');
-        const tabO = document.getElementById('tab-btn-oficina');
-        const tabC = document.getElementById('tab-btn-campo');
-        
-        tabO.className = m === 'OFICINA' ? 'tab active' : 'tab';
-        tabC.className = m === 'CAMPO' ? 'tab active-campo' : 'tab';
-        
-        btn.className = m === 'OFICINA' ? 'btn-save btn-oficina' : 'btn-save btn-campo';
-        if(!ID_EDITANDO) btn.innerText = m === 'OFICINA' ? "GUARDAR EN NUBE" : "SUBIR BAUCHER";
-        
-        llenarCuentas();
-    };
-
-    window.autoCobrador = function() {
-        const z = document.getElementById('zona');
-        const opt = z.options[z.selectedIndex];
-        document.getElementById('cobrador').value = opt.getAttribute('data-c') || "";
-    };
-
-    function llenarSelects() {
-        const z = document.getElementById('zona');
+    function llenarZonas() {
+        const sel = document.getElementById('zona');
         for (const [cob, list] of Object.entries(rutas)) {
-            const g = document.createElement('optgroup'); g.label = cob;
-            list.forEach(l => {
-                const o = document.createElement('option');
-                o.value = l; o.innerText = l; o.setAttribute('data-c', cob);
-                g.appendChild(o);
+            const grp = document.createElement('optgroup'); grp.label = cob;
+            list.forEach(z => {
+                const op = document.createElement('option'); op.value = z; op.innerText = z; op.setAttribute('data-c', cob);
+                grp.appendChild(op);
             });
-            z.appendChild(g);
+            sel.appendChild(grp);
         }
     }
+    
+    window.autoCobrador = function() {
+        const sel = document.getElementById('zona');
+        document.getElementById('cobrador').value = sel.options[sel.selectedIndex].getAttribute('data-c') || "";
+    }
 
-    function llenarCuentas() {
+    function actualizarCuentas() {
         const c = document.getElementById('cuenta');
-        const old = c.value;
-        c.innerHTML = "";
-        if(MODO === 'OFICINA') {
-            c.innerHTML = "<option value='LESLY'>🏦 CUENTA LESLY</option>";
-        } else {
-            c.innerHTML = "<option value='DAVID'>🏦 CUENTA DAVID</option><option value='DAVID_LESLY'>🏦 DAVID (VIA LESLY)</option><option value='JOSE_RODINDER'>🏦 JOSE RODINDER</option>";
-        }
-        c.value = old;
-    }
-
-    // --- 6. PINTAR TABLA (EL CORAZÓN DEL SISTEMA) ---
-    function pintarTabla() {
-        const div = document.getElementById('reportes');
-        div.innerHTML = "";
-        let total = 0;
-
-        const grupos = {
-            "DAVID": { t: "CUENTA DAVID", c: "border-david" },
-            "LESLY": { t: "CUENTA LESLY", c: "border-lesly" },
-            "DAVID_LESLY": { t: "DAVID (VIA LESLY)", c: "border-mix" },
-            "JOSE_RODINDER": { t: "JOSE RODINDER", c: "border-jose" }
-        };
-
-        for (const [key, conf] of Object.entries(grupos)) {
-            const list = registros.filter(r => r.cuenta === key);
-            if(list.length > 0) {
-                let sub = 0;
-                let rows = "";
-                
-                // Ordenar por fecha
-                list.sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
-
-                list.forEach(r => {
-                    sub += r.monto;
-                    rows += `<tr>
-                        <td>${r.zona}</td>
-                        <td>${r.cobrador}</td>
-                        <td>${r.ref}</td>
-                        <td>L. ${r.monto.toLocaleString()}</td>
-                        <td class="no-print">
-                            <button class="btn-action btn-edit" onclick="editar('${r.id}')">✏️</button>
-                            <button class="btn-action btn-delete" onclick="borrar('${r.id}')">🗑️</button>
-                        </td>
-                    </tr>`;
-                });
-                total += sub;
-
-                div.innerHTML += `
-                <div class="report-section ${conf.c}">
-                    <h3 class="account-title">${conf.t} <span>L. ${sub.toLocaleString()}</span></h3>
-                    <table>
-                        <thead><tr><th>Zona</th><th>Cobrador</th><th>Ref</th><th>Monto</th><th class="no-print">Acción</th></tr></thead>
-                        <tbody>${rows}</tbody>
-                    </table>
-                </div>`;
-            }
-        }
-        document.getElementById('gran-total').innerText = "L. " + total.toLocaleString();
+        c.innerHTML = MODO === 'OFICINA' 
+            ? "<option value='LESLY'>CUENTA LESLY</option>" 
+            : "<option value='DAVID'>CUENTA DAVID</option><option value='DAVID_LESLY'>DAVID (VIA LESLY)</option><option value='JOSE_RODINDER'>JOSE RODINDER</option>";
     }
 </script>
 
