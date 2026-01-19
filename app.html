@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Milagro v4</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <style>
+        body { font-family: sans-serif; background: #f4f4f4; margin: 0; padding-bottom: 50px; }
+        header { background: #004d40; color: white; padding: 15px; text-align: center; }
+        .container { max-width: 800px; margin: 0 auto; padding: 10px; }
+        
+        .caja-blanca { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        
+        label { display: block; margin-top: 10px; font-weight: bold; font-size: 0.9rem; }
+        input, select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        
+        /* BOTONES */
+        .btn-grande { width: 100%; padding: 15px; border: none; color: white; font-weight: bold; margin-top: 20px; border-radius: 5px; cursor: pointer; font-size: 1rem; }
+        .azul { background: #004d40; }
+        .naranja { background: #e65100; }
+        .rojo { background: #d32f2f; margin-top: 5px; display: none; } /* Boton cancelar */
+
+        /* PESTAÑAS */
+        .tabs { display: flex; margin-bottom: 10px; }
+        .tab { flex: 1; padding: 10px; text-align: center; background: #ddd; cursor: pointer; font-weight: bold; }
+        .active-oficina { background: #004d40; color: white; }
+        .active-campo { background: #e65100; color: white; }
+
+        /* TABLA */
+        .tarjeta-registro { background: white; border-left: 5px solid #004d40; margin-top: 10px; padding: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .info { font-size: 0.9rem; }
+        .acciones button { margin-left: 5px; padding: 5px 10px; cursor: pointer; border: none; border-radius: 3px; }
+        .btn-editar { background: #2196F3; color: white; }
+        .btn-borrar { background: #F44336; color: white; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h2>SISTEMA MILAGRO</h2>
+    <small id="estado">Conectando...</small>
+</header>
+
+<div class="container">
+    
+    <div class="tabs">
+        <div id="tab1" class="tab active-oficina" onclick="cambiarModo('OFICINA')">🏢 OFICINA</div>
+        <div id="tab2" class="tab" onclick="cambiarModo('CAMPO')">🏍️ CAMPO</div>
+    </div>
+
+    <div class="caja-blanca">
+        <h3 id="titulo-form" style="margin-top:0; text-align:center;">INGRESO DE DATOS</h3>
+        
+        <label>Semana:</label>
+        <select id="semana"><option>Semana 1</option><option>Semana 2</option><option>Semana 3</option><option>Semana 4</option><option>Semana 5</option></select>
+        
+        <label>Fecha:</label>
+        <input type="date" id="fecha">
+
+        <label>Referencia:</label>
+        <input type="number" id="referencia" placeholder="Número de recibo">
+
+        <label>Zona:</label>
+        <select id="zona" onchange="autoCompletar()"></select>
+
+        <label>Cobrador:</label>
+        <input type="text" id="cobrador" readonly style="background:#eee;">
+
+        <label>Cuenta Destino:</label>
+        <select id="cuenta"></select>
+
+        <label>Monto (L.):</label>
+        <input type="number" id="monto">
+
+        <button id="btn-guardar" class="btn-grande azul" onclick="guardar()">GUARDAR</button>
+        <button id="btn-cancelar" class="btn-grande rojo" onclick="cancelarEdicion()">CANCELAR EDICIÓN</button>
+    </div>
+
+    <div id="lista-registros" style="margin-top: 20px;"></div>
+    
+    <div style="text-align: right; font-size: 1.5rem; font-weight: bold; margin-top: 20px; padding: 10px; background: #333; color: white;">
+        TOTAL: <span id="total-global">L. 0.00</span>
+    </div>
+</div>
+
+<script>
+    // 1. CONFIGURACION DE FIREBASE
+    var firebaseConfig = {
+      apiKey: "AIzaSyAYJRmMQbV-j6hGfHCZyuCgtvmkY0C2L1g",
+      authDomain: "ingreso-depositos.firebaseapp.com",
+      databaseURL: "https://ingreso-depositos-default-rtdb.firebaseio.com",
+      projectId: "ingreso-depositos",
+      storageBucket: "ingreso-depositos.firebasestorage.app",
+      messagingSenderId: "788432921819",
+      appId: "1:788432921819:web:b5f792eecbe4b7b00498fe"
+    };
+    
+    // INICIAR FIREBASE
+    firebase.initializeApp(firebaseConfig);
+    var db = firebase.database();
+    
+    // VARIABLES GLOBALES
+    var MODO = "OFICINA";
+    var ID_EDITANDO = null;
+    var registros = [];
+
+    // DATOS FIJOS
+    var rutas = {
+        "MIGUEL": ["Elixir", "Saba Olanchito", "Zona Saba"],
+        "ANGEL": ["Margen Izquierda", "Saba Tocoa"],
+        "FERNANDO": ["Vicinia", "Trujillo", "Honduras Aguan"],
+        "AMALET": ["Balfate", "Bonito Oriental"],
+        "JORGE": ["Planes", "Jutiapa", "Sonaguera", "Faust"]
+    };
+
+    // AL CARGAR LA PAGINA
+    window.onload = function() {
+        document.getElementById('fecha').valueAsDate = new Date();
+        llenarZonas();
+        actualizarCuentas();
+        
+        // ESCUCHAR DATOS DE FIREBASE
+        db.ref('registros_milagro').on('value', function(snapshot) {
+            registros = [];
+            var data = snapshot.val();
+            if(data) {
+                Object.keys(data).forEach(function(key) {
+                    registros.push({ id: key, ...data[key] });
+                });
+            }
+            pintarPantalla();
+            document.getElementById('estado').innerText = "🟢 Conectado";
+        });
+    };
+
+    // FUNCION GUARDAR
+    function guardar() {
+        var sem = document.getElementById('semana').value;
+        var fec = document.getElementById('fecha').value;
+        var ref = document.getElementById('referencia').value;
+        var zon = document.getElementById('zona').value;
+        var cob = document.getElementById('cobrador').value;
+        var cue = document.getElementById('cuenta').value;
+        var mon = parseFloat(document.getElementById('monto').value);
+
+        if(!zon || !cob || !ref || isNaN(mon)) {
+            alert("⚠️ Faltan datos por llenar");
+            return;
+        }
+
+        var datos = {
+            origen: MODO,
+            semana: sem, fecha: fec, ref: ref, zona: zon, cobrador: cob, cuenta: cue, monto: mon
+        };
+
+        if(ID_EDITANDO) {
+            // ACTUALIZAR
+            db.ref('registros_milagro/' + ID_EDITANDO).update(datos, function(error) {
+                if(error) alert("Error: " + error);
+                else { alert("✅ Actualizado"); cancelarEdicion(); }
+            });
+        } else {
+            // GUARDAR NUEVO
+            // Verificar duplicado
+            var duplicado = registros.find(r => r.ref == ref);
+            if(duplicado) {
+                alert("⛔ CUIDADO: Esa referencia ya existe.");
+                return;
+            }
+
+            db.ref('registros_milagro').push(datos, function(error) {
+                if(error) alert("Error: " + error);
+                else {
+                    // Limpiar solo montos y ref
+                    document.getElementById('referencia').value = "";
+                    document.getElementById('monto').value = "";
+                    document.getElementById('referencia').focus();
+                }
+            });
+        }
+    }
+
+    // FUNCION BORRAR
+    window.borrar = function(id) {
+        if(confirm("¿Seguro que quieres eliminar este registro?")) {
+            db.ref('registros_milagro/' + id).remove();
+        }
+    }
+
+    // FUNCION EDITAR
+    window.editar = function(id) {
+        var r = registros.find(item => item.id === id);
+        if(!r) return;
+
+        // Cargar datos al form
+        cambiarModo(r.origen);
+        document.getElementById('semana').value = r.semana;
+        document.getElementById('fecha').value = r.fecha;
+        document.getElementById('referencia').value = r.ref;
+        document.getElementById('zona').value = r.zona;
+        document.getElementById('cobrador').value = r.cobrador;
+        document.getElementById('cuenta').value = r.cuenta;
+        document.getElementById('monto').value = r.monto;
+
+        // Cambiar estado visual
+        ID_EDITANDO = id;
+        document.getElementById('btn-guardar').innerText = "ACTUALIZAR REGISTRO";
+        document.getElementById('btn-guardar').style.background = "#2196F3";
+        document.getElementById('btn-cancelar').style.display = "block";
+        document.getElementById('titulo-form').innerText = "✏️ EDITANDO REF: " + r.ref;
+        window.scrollTo(0,0);
+    }
+
+    // FUNCION CANCELAR EDICION
+    window.cancelarEdicion = function() {
+        ID_EDITANDO = null;
+        document.getElementById('referencia').value = "";
+        document.getElementById('monto').value = "";
+        
+        document.getElementById('btn-guardar').innerText = "GUARDAR";
+        document.getElementById('btn-guardar').style.background = MODO === 'OFICINA' ? "#004d40" : "#e65100";
+        document.getElementById('btn-cancelar').style.display = "none";
+        document.getElementById('titulo-form').innerText = "INGRESO DE DATOS";
+    }
+
+    // FUNCIONES AUXILIARES
+    window.cambiarModo = function(modo) {
+        MODO = modo;
+        var btn = document.getElementById('btn-guardar');
+        var tab1 = document.getElementById('tab1');
+        var tab2 = document.getElementById('tab2');
+
+        if(modo === 'OFICINA') {
+            tab1.className = "tab active-oficina";
+            tab2.className = "tab";
+            if(!ID_EDITANDO) { btn.style.background = "#004d40"; btn.innerText = "GUARDAR (OFICINA)"; }
+        } else {
+            tab1.className = "tab";
+            tab2.className = "tab active-campo";
+            if(!ID_EDITANDO) { btn.style.background = "#e65100"; btn.innerText = "SUBIR (CAMPO)"; }
+        }
+        actualizarCuentas();
+    }
+
+    function llenarZonas() {
+        var select = document.getElementById('zona');
+        for (var cobrador in rutas) {
+            var optgroup = document.createElement('optgroup');
+            optgroup.label = cobrador;
+            rutas[cobrador].forEach(function(zona) {
+                var opt = document.createElement('option');
+                opt.value = zona;
+                opt.innerText = zona;
+                opt.setAttribute('data-cobrador', cobrador);
+                optgroup.appendChild(opt);
+            });
+            select.appendChild(optgroup);
+        }
+    }
+
+    window.autoCompletar = function() {
+        var select = document.getElementById('zona');
+        var opt = select.options[select.selectedIndex];
+        document.getElementById('cobrador').value = opt.getAttribute('data-cobrador');
+    }
+
+    function actualizarCuentas() {
+        var sel = document.getElementById('cuenta');
+        var val = sel.value;
+        sel.innerHTML = "";
+        if(MODO === 'OFICINA') {
+            sel.innerHTML = "<option value='LESLY'>CUENTA LESLY</option>";
+        } else {
+            sel.innerHTML = "<option value='DAVID'>CUENTA DAVID</option><option value='DAVID_LESLY'>DAVID (VIA LESLY)</option><option value='JOSE_RODINDER'>JOSE RODINDER</option>";
+        }
+        sel.value = val;
+    }
+
+    function pintarPantalla() {
+        var contenedor = document.getElementById('lista-registros');
+        contenedor.innerHTML = "";
+        var total = 0;
+
+        // Ordenar por fecha (más reciente primero)
+        registros.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+
+        registros.forEach(function(reg) {
+            total += reg.monto;
+            
+            var colorBorde = reg.origen === 'OFICINA' ? '#004d40' : '#e65100';
+            
+            var html = `
+            <div class="tarjeta-registro" style="border-left-color: ${colorBorde}">
+                <div class="info">
+                    <strong>${reg.zona}</strong> (${reg.cobrador})<br>
+                    Ref: <b>${reg.ref}</b> | ${reg.fecha}<br>
+                    Destino: ${reg.cuenta}<br>
+                    <span style="color:green; font-weight:bold; font-size:1.1rem">L. ${reg.monto.toLocaleString()}</span>
+                </div>
+                <div class="acciones">
+                    <button class="btn-editar" onclick="editar('${reg.id}')">✏️</button>
+                    <button class="btn-borrar" onclick="borrar('${reg.id}')">🗑️</button>
+                </div>
+            </div>`;
+            contenedor.innerHTML += html;
+        });
+
+        document.getElementById('total-global').innerText = "L. " + total.toLocaleString();
+    }
+</script>
+
+</body>
+</html>
