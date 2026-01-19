@@ -39,7 +39,6 @@
         .btn-campo { background-color: var(--field-color); }
         .btn-campo:hover { background-color: #bf360c; }
         
-        /* ESTILOS NUEVOS PARA EDITAR */
         .btn-actualizar { background-color: var(--edit) !important; animation: parpadeo 2s infinite; }
         .btn-cancelar { background-color: #757575; color: white; border: none; padding: 12px; border-radius: 5px; font-weight: bold; cursor: pointer; display: none; }
         
@@ -62,7 +61,6 @@
         .badge-oficina { background: #e0f2f1; color: var(--primary); border: 1px solid var(--primary); }
         .badge-campo { background: #fff3e0; color: var(--field-color); border: 1px solid var(--field-color); }
 
-        /* BOTONES DE ACCIÓN EN TABLA */
         .btn-action { cursor: pointer; padding: 4px 8px; border-radius: 4px; border: none; font-weight: bold; margin-right: 2px; }
         .btn-edit { background: #e3f2fd; color: var(--edit); }
         .btn-delete { background: #ffebee; color: var(--error); }
@@ -74,11 +72,9 @@
 
         .grand-total-box { background: #222; color: white; padding: 15px; text-align: right; font-size: 1.2rem; margin-top: 20px; font-weight: bold; }
 
-        /* ESTADO DE CONEXIÓN */
         #status-bar { text-align: center; padding: 5px; font-size: 0.8rem; background: #333; color: white; transition: 0.5s; }
         .online { background: #2e7d32 !important; }
 
-        /* MODO IMPRESIÓN */
         @media print {
             .tabs, .card, .btn-pdf, header, #status-bar, .no-print { display: none !important; }
             #print-header { display: block !important; text-align: center; border-bottom: 2px solid #333; margin-bottom: 20px; }
@@ -102,8 +98,8 @@
 <div class="container">
 
     <div class="tabs">
-        <div class="tab active" id="tab-btn-oficina" onclick="cambiarModo('OFICINA')">🏢 COBRO ADMINISTRACIÓN</div>
-        <div class="tab" id="tab-btn-campo" onclick="cambiarModo('CAMPO')">🏍️ DEPÓSITOS VENDEDORES</div>
+        <div class="tab active" id="tab-btn-oficina" onclick="window.cambiarModo('OFICINA')">🏢 COBRO ADMINISTRACIÓN</div>
+        <div class="tab" id="tab-btn-campo" onclick="window.cambiarModo('CAMPO')">🏍️ DEPÓSITOS VENDEDORES</div>
     </div>
 
     <div class="card">
@@ -114,15 +110,15 @@
             </select></div>
             <div><label>Fecha:</label><input type="date" id="fecha"></div>
             <div><label>Referencia / Baucher:</label><input type="number" id="referencia" placeholder="Ej. 12345"></div>
-            <div class="full-width"><label>Zona:</label><select id="zona" onchange="actualizarCobrador()"><option value="">-- Seleccione Zona --</option></select></div>
+            <div class="full-width"><label>Zona:</label><select id="zona" onchange="window.actualizarCobrador()"><option value="">-- Seleccione Zona --</option></select></div>
             <div class="full-width"><label>Cobrador:</label><input type="text" id="cobrador" readonly style="background:#eee;"></div>
             <div class="full-width"><label>Cuenta Destino:</label><select id="cuenta" style="font-weight:bold; color:#004d40;"></select></div>
             <div class="full-width"><label>Monto (L.):</label><input type="number" id="monto" placeholder="0.00"></div>
         </div>
         
         <div class="btn-group">
-            <button id="btn-cancelar" class="btn-cancelar" onclick="cancelarEdicion()">CANCELAR EDICIÓN</button>
-            <button id="btn-accion" class="btn-save btn-oficina" onclick="guardarEnFirebase()">GUARDAR EN LA NUBE</button>
+            <button id="btn-cancelar" class="btn-cancelar" onclick="window.cancelarEdicion()">CANCELAR EDICIÓN</button>
+            <button id="btn-accion" class="btn-save btn-oficina" onclick="window.guardarEnFirebase()">GUARDAR EN LA NUBE</button>
         </div>
     </div>
 
@@ -142,10 +138,9 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    // IMPORTANTE: Ahora importamos 'update' para poder editar
     import { getDatabase, ref, push, update, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-    // --- TUS CREDENCIALES ---
+    // --- CONFIGURACIÓN ---
     const firebaseConfig = {
       apiKey: "AIzaSyAYJRmMQbV-j6hGfHCZyuCgtvmkY0C2L1g",
       authDomain: "ingreso-depositos.firebaseapp.com",
@@ -157,13 +152,30 @@
       measurementId: "G-2VR37Z1MQL"
     };
 
-    // INICIALIZAR APP
+    // VARIABLES GLOBALES
+    let registrosLocales = [];
+    let idEditando = null;
+    let MODO_ACTUAL = 'OFICINA';
+
+    const rutas = {
+        "MIGUEL": ["Elixir", "Saba Olanchito", "Zona Saba"],
+        "ANGEL": ["Margen Izquierda", "Saba Tocoa"],
+        "FERNANDO": ["Vicinia", "Trujillo", "Honduras Aguan"],
+        "AMALET": ["Balfate", "Bonito Oriental"],
+        "JORGE": ["Planes", "Jutiapa", "Sonaguera", "Faust"]
+    };
+    
+    const configCuentas = {
+        "DAVID": { titulo: "CUENTA DAVID", color: "border-david" },
+        "LESLY": { titulo: "CUENTA LESLY", color: "border-lesly" },
+        "DAVID_LESLY": { titulo: "CUENTA DAVID (VÍA LESLY)", color: "border-mix" },
+        "JOSE_RODINDER": { titulo: "JOSE RODINDER GUARDADO PINEDA", color: "border-jose" }
+    };
+
+    // INICIAR APP
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
     const registrosRef = ref(db, 'registros_milagro');
-
-    let registrosLocales = [];
-    let idEditando = null; // Variable para saber si estamos editando
 
     // ESCUCHAR DATOS
     onValue(registrosRef, (snapshot) => {
@@ -174,16 +186,16 @@
                 registrosLocales.push({ idFirebase: key, ...data[key] });
             });
         }
-        
-        if (window.pintarHTML) window.pintarHTML(registrosLocales);
+        pintarHTML(registrosLocales);
         
         const status = document.getElementById('status-bar');
         status.innerText = "🟢 Conectado y Sincronizado";
         status.classList.add('online');
     });
 
-    // FUNCIÓN GUARDAR / ACTUALIZAR
-    window.guardarEnFirebase = function() {
+    // --- FUNCIONES LÓGICAS ---
+
+    function guardarEnFirebase() {
         const semana = document.getElementById('semana').value;
         const fecha = document.getElementById('fecha').value;
         const refNum = document.getElementById('referencia').value.trim();
@@ -194,78 +206,68 @@
 
         if (!zona || !cobrador || isNaN(monto) || !refNum) { alert("⚠️ Falta información"); return; }
 
-        // MODO EDICIÓN: ACTUALIZAR
+        // ACTUALIZAR
         if (idEditando) {
             update(ref(db, 'registros_milagro/' + idEditando), {
-                origen: window.MODO_ACTUAL,
+                origen: MODO_ACTUAL,
                 semana, fecha, ref: refNum, zona, cobrador, cuenta, monto
             })
             .then(() => {
-                alert("✅ Registro actualizado correctamente");
-                window.cancelarEdicion(); // Salir del modo edición
+                alert("✅ Registro actualizado");
+                cancelarEdicion();
             })
-            .catch(err => alert("Error al actualizar: " + err.message));
+            .catch(err => alert("Error: " + err.message));
             return;
         }
 
-        // MODO NORMAL: NUEVO REGISTRO
-        // Validar duplicados solo si es nuevo
+        // NUEVO REGISTRO
         const duplicado = registrosLocales.find(r => r.ref === refNum);
         if (duplicado) { 
             alert(`⛔ DUPLICADO: El recibo ${refNum} ya existe en ${duplicado.zona}`); 
             return; 
         }
 
-        push(registrosRef, { origen: window.MODO_ACTUAL, semana, fecha, ref: refNum, zona, cobrador, cuenta, monto })
+        push(registrosRef, { origen: MODO_ACTUAL, semana, fecha, ref: refNum, zona, cobrador, cuenta, monto })
         .then(() => {
-            // Limpiar campos
             document.getElementById('monto').value = "";
             document.getElementById('referencia').value = "";
             document.getElementById('referencia').focus();
         })
         .catch(err => alert("Error: " + err.message));
     }
-    
-    // FUNCIÓN BORRAR
-    window.eliminarDeNube = function(id) {
-        if(confirm("⚠️ ¿Seguro que quieres ELIMINAR este registro permanentemente?")) {
+
+    function eliminarDeNube(id) {
+        if(confirm("⚠️ ¿Eliminar registro permanentemente?")) {
             remove(ref(db, `registros_milagro/${id}`));
         }
     }
 
-    // FUNCIÓN PREPARAR EDICIÓN (Se llama desde el botón lápiz)
-    window.cargarParaEditar = function(id) {
+    function cargarParaEditar(id) {
         const registro = registrosLocales.find(r => r.idFirebase === id);
         if (!registro) return;
 
-        // 1. Cambiar al modo correcto (Oficina/Campo)
-        window.cambiarModo(registro.origen);
+        cambiarModo(registro.origen);
 
-        // 2. Llenar campos
         document.getElementById('semana').value = registro.semana;
         document.getElementById('fecha').value = registro.fecha;
         document.getElementById('referencia').value = registro.ref;
-        // Seleccionar zona y disparar evento para llenar cobrador
         document.getElementById('zona').value = registro.zona;
-        window.actualizarCobrador(); 
+        actualizarCobrador();
         document.getElementById('cuenta').value = registro.cuenta;
         document.getElementById('monto').value = registro.monto;
 
-        // 3. Activar modo visual de edición
         idEditando = id;
         const btn = document.getElementById('btn-accion');
         btn.innerText = "ACTUALIZAR REGISTRO";
         btn.classList.add('btn-actualizar');
         document.getElementById('btn-cancelar').style.display = 'block';
         document.getElementById('indicador-modo').classList.add('mode-editando');
-        document.getElementById('indicador-modo').innerText = "✏️ EDITANDO REGISTRO: " + registro.ref;
+        document.getElementById('indicador-modo').innerText = "✏️ EDITANDO: " + registro.ref;
 
-        // 4. Subir scroll
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // FUNCIÓN CANCELAR EDICIÓN
-    window.cancelarEdicion = function() {
+    function cancelarEdicion() {
         idEditando = null;
         document.getElementById('monto').value = "";
         document.getElementById('referencia').value = "";
@@ -275,63 +277,38 @@
         btn.classList.remove('btn-actualizar');
         document.getElementById('indicador-modo').classList.remove('mode-editando');
         
-        // Restaurar textos originales
-        window.cambiarModo(window.MODO_ACTUAL);
+        cambiarModo(MODO_ACTUAL);
     }
-</script>
 
-<script>
-    const rutas = {
-        "MIGUEL": ["Elixir", "Saba Olanchito", "Zona Saba"],
-        "ANGEL": ["Margen Izquierda", "Saba Tocoa"],
-        "FERNANDO": ["Vicinia", "Trujillo", "Honduras Aguan"],
-        "AMALET": ["Balfate", "Bonito Oriental"],
-        "JORGE": ["Planes", "Jutiapa", "Sonaguera", "Faust"]
-    };
-    const configCuentas = {
-        "DAVID": { titulo: "CUENTA DAVID", color: "border-david" },
-        "LESLY": { titulo: "CUENTA LESLY", color: "border-lesly" },
-        "DAVID_LESLY": { titulo: "CUENTA DAVID (VÍA LESLY)", color: "border-mix" },
-        "JOSE_RODINDER": { titulo: "JOSE RODINDER GUARDADO PINEDA", color: "border-jose" }
-    };
+    // --- FUNCIONES DE INTERFAZ ---
 
-    window.MODO_ACTUAL = 'OFICINA';
-
-    window.onload = function() {
-        document.getElementById('fecha').valueAsDate = new Date();
-        cargarZonasEnSelect();
-        actualizarSelectCuentas();
-    };
-
-    window.cambiarModo = function(modo) {
-        window.MODO_ACTUAL = modo;
+    function cambiarModo(modo) {
+        MODO_ACTUAL = modo;
         const tabOficina = document.getElementById('tab-btn-oficina');
         const tabCampo = document.getElementById('tab-btn-campo');
         const indicador = document.getElementById('indicador-modo');
         const boton = document.getElementById('btn-accion');
 
-        // Reset
         tabOficina.className = 'tab'; tabCampo.className = 'tab';
         indicador.className = 'mode-indicator'; boton.className = 'btn-save';
 
         if (modo === 'OFICINA') {
             tabOficina.classList.add('active');
             indicador.classList.add('mode-oficina'); indicador.innerText = "MODO: OFICINA (SOLO LESLY)";
-            boton.classList.add('btn-oficina'); boton.innerText = "GUARDAR EN LA NUBE";
+            boton.classList.add('btn-oficina'); boton.innerText = idEditando ? "ACTUALIZAR REGISTRO" : "GUARDAR EN LA NUBE";
         } else {
             tabCampo.classList.add('active-campo');
             indicador.classList.add('mode-campo'); indicador.innerText = "MODO: VENDEDORES (OTRAS CUENTAS)";
-            boton.classList.add('btn-campo'); boton.innerText = "SUBIR BAUCHER A LA NUBE";
+            boton.classList.add('btn-campo'); boton.innerText = idEditando ? "ACTUALIZAR REGISTRO" : "SUBIR BAUCHER A LA NUBE";
         }
         actualizarSelectCuentas();
     }
 
-    window.actualizarSelectCuentas = function() {
+    function actualizarSelectCuentas() {
         const select = document.getElementById('cuenta');
-        // Guardar valor actual si existe para no perderlo al cambiar modo
-        const valorActual = select.value; 
+        const valorActual = select.value;
         select.innerHTML = "";
-        if (window.MODO_ACTUAL === 'OFICINA') {
+        if (MODO_ACTUAL === 'OFICINA') {
             select.innerHTML = '<option value="LESLY">🏦 CAJA / CUENTA LESLY</option>';
         } else {
             select.innerHTML = `
@@ -340,10 +317,14 @@
                 <option value="JOSE_RODINDER">🏦 JOSE RODINDER GUARDADO PINEDA</option>
             `;
         }
-        if(valorActual) select.value = valorActual;
+        if(valorActual) {
+             // Verificar si el valor actual existe en las nuevas opciones
+             const existe = Array.from(select.options).some(op => op.value === valorActual);
+             if(existe) select.value = valorActual;
+        }
     }
 
-    window.cargarZonasEnSelect = function() {
+    function cargarZonasEnSelect() {
         const selectZona = document.getElementById('zona');
         for (const [nombreCobrador, zonas] of Object.entries(rutas)) {
             const grupo = document.createElement('optgroup');
@@ -357,13 +338,13 @@
         }
     }
 
-    window.actualizarCobrador = function() {
+    function actualizarCobrador() {
         const selectZona = document.getElementById('zona');
         const opcion = selectZona.options[selectZona.selectedIndex];
         document.getElementById('cobrador').value = opcion && opcion.value ? opcion.getAttribute('data-cobrador') : "";
     }
 
-    window.pintarHTML = function(listaRegistros) {
+    function pintarHTML(listaRegistros) {
         const contenedor = document.getElementById('contenedor-reportes');
         contenedor.innerHTML = ""; 
         let granTotal = 0;
@@ -402,15 +383,14 @@
                             <td>${reg.ref}</td>
                             <td>L. ${reg.monto.toLocaleString('es-HN', {minimumFractionDigits: 2})}</td>
                             <td class="no-print" style="white-space:nowrap; text-align:center;">
-                                <button class="btn-action btn-edit" onclick="cargarParaEditar('${reg.idFirebase}')" title="Editar">✏️</button>
-                                <button class="btn-action btn-delete" onclick="eliminarDeNube('${reg.idFirebase}')" title="Eliminar">🗑️</button>
+                                <button class="btn-action btn-edit" onclick="window.cargarParaEditar('${reg.idFirebase}')" title="Editar">✏️</button>
+                                <button class="btn-action btn-delete" onclick="window.eliminarDeNube('${reg.idFirebase}')" title="Eliminar">🗑️</button>
                             </td>
                         </tr>
                     `;
                 });
                 granTotal += subtotalCuenta;
 
-                // Resumen Zona
                 let resumenZonaHTML = `<div class="zone-summary-box"><div class="zone-summary-title">Resumen por Zona (${config.titulo})</div>`;
                 Object.keys(totalesPorZona).sort().forEach(zona => {
                     resumenZonaHTML += `
@@ -436,6 +416,22 @@
         }
         document.getElementById('gran-total-display').innerText = "L. " + granTotal.toLocaleString('es-HN', {minimumFractionDigits: 2});
     }
+
+    // --- EXPORTAR A WINDOW (ESTO ES CRUCIAL) ---
+    // Al usar type="module", las funciones son privadas por defecto.
+    // Aquí las hacemos públicas para que los botones HTML las vean.
+    window.guardarEnFirebase = guardarEnFirebase;
+    window.eliminarDeNube = eliminarDeNube;
+    window.cargarParaEditar = cargarParaEditar;
+    window.cancelarEdicion = cancelarEdicion;
+    window.cambiarModo = cambiarModo;
+    window.actualizarCobrador = actualizarCobrador;
+    
+    // INICIALIZAR FORMULARIO
+    document.getElementById('fecha').valueAsDate = new Date();
+    cargarZonasEnSelect();
+    actualizarSelectCuentas();
+
 </script>
 
 </body>
