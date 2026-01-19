@@ -9,7 +9,7 @@
     <style>
         :root { 
             --primary: #004d40; --secondary: #00796b; --field-color: #e65100;
-            --light: #e0f2f1; --accent: #ffd600; --error: #d32f2f;
+            --light: #e0f2f1; --accent: #ffd600; --error: #d32f2f; --edit: #1976d2;
         }
         body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 0; padding: 0; padding-bottom: 60px;}
         header { background-color: var(--primary); color: white; padding: 15px; text-align: center; }
@@ -25,17 +25,25 @@
         .mode-indicator { text-align: center; padding: 10px; margin-bottom: 15px; border-radius: 5px; font-weight: bold; }
         .mode-oficina { background: #e0f2f1; color: var(--primary); border: 1px solid var(--primary); }
         .mode-campo { background: #fff3e0; color: var(--field-color); border: 1px solid var(--field-color); }
+        .mode-editando { background: #e3f2fd; color: var(--edit); border: 2px dashed var(--edit); }
 
         .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
         .full-width { grid-column: span 3; }
         label { display: block; font-size: 0.85rem; font-weight: bold; color: #555; margin-bottom: 5px; }
         select, input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
         
-        .btn-save { width: 100%; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 15px; color: white; transition: 0.3s; }
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-save { flex: 1; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; color: white; transition: 0.3s; }
         .btn-oficina { background-color: var(--secondary); }
         .btn-oficina:hover { background-color: var(--primary); }
         .btn-campo { background-color: var(--field-color); }
         .btn-campo:hover { background-color: #bf360c; }
+        
+        /* ESTILOS NUEVOS PARA EDITAR */
+        .btn-actualizar { background-color: var(--edit) !important; animation: parpadeo 2s infinite; }
+        .btn-cancelar { background-color: #757575; color: white; border: none; padding: 12px; border-radius: 5px; font-weight: bold; cursor: pointer; display: none; }
+        
+        @keyframes parpadeo { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
 
         /* REPORTE */
         .report-section { background: white; border-radius: 8px; padding: 15px; margin-bottom: 20px; border-top: 5px solid #555; page-break-inside: avoid; }
@@ -53,6 +61,11 @@
         .badge { padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; }
         .badge-oficina { background: #e0f2f1; color: var(--primary); border: 1px solid var(--primary); }
         .badge-campo { background: #fff3e0; color: var(--field-color); border: 1px solid var(--field-color); }
+
+        /* BOTONES DE ACCIÓN EN TABLA */
+        .btn-action { cursor: pointer; padding: 4px 8px; border-radius: 4px; border: none; font-weight: bold; margin-right: 2px; }
+        .btn-edit { background: #e3f2fd; color: var(--edit); }
+        .btn-delete { background: #ffebee; color: var(--error); }
 
         .zone-summary-box { background: #fafafa; border: 1px solid #ddd; padding: 8px; margin-top: 8px; font-size: 0.85rem; page-break-inside: avoid; }
         .zone-summary-title { font-weight: bold; margin-bottom: 4px; border-bottom: 1px solid #ccc; }
@@ -72,7 +85,6 @@
             .report-section { box-shadow: none; border: 1px solid #ddd; border-top-width: 5px; }
             body { background: white; }
             .grand-total-box { background-color: #222 !important; color: white !important; }
-            /* Asegurar colores de fondo en Chrome */
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
         }
         @media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } .full-width { grid-column: span 1; } }
@@ -107,7 +119,11 @@
             <div class="full-width"><label>Cuenta Destino:</label><select id="cuenta" style="font-weight:bold; color:#004d40;"></select></div>
             <div class="full-width"><label>Monto (L.):</label><input type="number" id="monto" placeholder="0.00"></div>
         </div>
-        <button id="btn-accion" class="btn-save btn-oficina" onclick="guardarEnFirebase()">GUARDAR EN LA NUBE</button>
+        
+        <div class="btn-group">
+            <button id="btn-cancelar" class="btn-cancelar" onclick="cancelarEdicion()">CANCELAR EDICIÓN</button>
+            <button id="btn-accion" class="btn-save btn-oficina" onclick="guardarEnFirebase()">GUARDAR EN LA NUBE</button>
+        </div>
     </div>
 
     <div id="area-de-reporte">
@@ -126,9 +142,10 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    // IMPORTANTE: Ahora importamos 'update' para poder editar
+    import { getDatabase, ref, push, update, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-    // --- TUS CREDENCIALES (YA CON EL URL CORREGIDO) ---
+    // --- TUS CREDENCIALES ---
     const firebaseConfig = {
       apiKey: "AIzaSyAYJRmMQbV-j6hGfHCZyuCgtvmkY0C2L1g",
       authDomain: "ingreso-depositos.firebaseapp.com",
@@ -143,11 +160,12 @@
     // INICIALIZAR APP
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const registrosRef = ref(db, 'registros_milagro'); // Carpeta en la nube
+    const registrosRef = ref(db, 'registros_milagro');
 
     let registrosLocales = [];
+    let idEditando = null; // Variable para saber si estamos editando
 
-    // ESCUCHAR DATOS (SIEMPRE ACTIVO)
+    // ESCUCHAR DATOS
     onValue(registrosRef, (snapshot) => {
         const data = snapshot.val();
         registrosLocales = [];
@@ -157,16 +175,14 @@
             });
         }
         
-        // PINTAR PANTALLA
         if (window.pintarHTML) window.pintarHTML(registrosLocales);
         
-        // AVISAR CONEXIÓN
         const status = document.getElementById('status-bar');
         status.innerText = "🟢 Conectado y Sincronizado";
         status.classList.add('online');
     });
 
-    // FUNCIÓN GUARDAR (EXPORTADA A WINDOW PARA QUE EL BOTÓN LA VEA)
+    // FUNCIÓN GUARDAR / ACTUALIZAR
     window.guardarEnFirebase = function() {
         const semana = document.getElementById('semana').value;
         const fecha = document.getElementById('fecha').value;
@@ -178,33 +194,93 @@
 
         if (!zona || !cobrador || isNaN(monto) || !refNum) { alert("⚠️ Falta información"); return; }
 
+        // MODO EDICIÓN: ACTUALIZAR
+        if (idEditando) {
+            update(ref(db, 'registros_milagro/' + idEditando), {
+                origen: window.MODO_ACTUAL,
+                semana, fecha, ref: refNum, zona, cobrador, cuenta, monto
+            })
+            .then(() => {
+                alert("✅ Registro actualizado correctamente");
+                window.cancelarEdicion(); // Salir del modo edición
+            })
+            .catch(err => alert("Error al actualizar: " + err.message));
+            return;
+        }
+
+        // MODO NORMAL: NUEVO REGISTRO
+        // Validar duplicados solo si es nuevo
         const duplicado = registrosLocales.find(r => r.ref === refNum);
         if (duplicado) { 
-            alert(`⛔ DUPLICADO: El recibo ${refNum} ya fue ingresado:\n📅 Fecha: ${duplicado.fecha}\n📍 Zona: ${duplicado.zona}\n💰 Monto: L. ${duplicado.monto}`); 
+            alert(`⛔ DUPLICADO: El recibo ${refNum} ya existe en ${duplicado.zona}`); 
             return; 
         }
 
-        // ENVIAR
         push(registrosRef, { origen: window.MODO_ACTUAL, semana, fecha, ref: refNum, zona, cobrador, cuenta, monto })
         .then(() => {
+            // Limpiar campos
             document.getElementById('monto').value = "";
             document.getElementById('referencia').value = "";
             document.getElementById('referencia').focus();
-            // No necesitamos alert porque la tabla se actualiza sola
         })
-        .catch(err => alert("Error al guardar: " + err.message));
+        .catch(err => alert("Error: " + err.message));
     }
     
     // FUNCIÓN BORRAR
     window.eliminarDeNube = function(id) {
-        if(confirm("¿Borrar permanentemente este registro de la nube?")) {
+        if(confirm("⚠️ ¿Seguro que quieres ELIMINAR este registro permanentemente?")) {
             remove(ref(db, `registros_milagro/${id}`));
         }
+    }
+
+    // FUNCIÓN PREPARAR EDICIÓN (Se llama desde el botón lápiz)
+    window.cargarParaEditar = function(id) {
+        const registro = registrosLocales.find(r => r.idFirebase === id);
+        if (!registro) return;
+
+        // 1. Cambiar al modo correcto (Oficina/Campo)
+        window.cambiarModo(registro.origen);
+
+        // 2. Llenar campos
+        document.getElementById('semana').value = registro.semana;
+        document.getElementById('fecha').value = registro.fecha;
+        document.getElementById('referencia').value = registro.ref;
+        // Seleccionar zona y disparar evento para llenar cobrador
+        document.getElementById('zona').value = registro.zona;
+        window.actualizarCobrador(); 
+        document.getElementById('cuenta').value = registro.cuenta;
+        document.getElementById('monto').value = registro.monto;
+
+        // 3. Activar modo visual de edición
+        idEditando = id;
+        const btn = document.getElementById('btn-accion');
+        btn.innerText = "ACTUALIZAR REGISTRO";
+        btn.classList.add('btn-actualizar');
+        document.getElementById('btn-cancelar').style.display = 'block';
+        document.getElementById('indicador-modo').classList.add('mode-editando');
+        document.getElementById('indicador-modo').innerText = "✏️ EDITANDO REGISTRO: " + registro.ref;
+
+        // 4. Subir scroll
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // FUNCIÓN CANCELAR EDICIÓN
+    window.cancelarEdicion = function() {
+        idEditando = null;
+        document.getElementById('monto').value = "";
+        document.getElementById('referencia').value = "";
+        document.getElementById('btn-cancelar').style.display = 'none';
+        
+        const btn = document.getElementById('btn-accion');
+        btn.classList.remove('btn-actualizar');
+        document.getElementById('indicador-modo').classList.remove('mode-editando');
+        
+        // Restaurar textos originales
+        window.cambiarModo(window.MODO_ACTUAL);
     }
 </script>
 
 <script>
-    // CONFIGURACIÓN LOCAL
     const rutas = {
         "MIGUEL": ["Elixir", "Saba Olanchito", "Zona Saba"],
         "ANGEL": ["Margen Izquierda", "Saba Tocoa"],
@@ -221,14 +297,12 @@
 
     window.MODO_ACTUAL = 'OFICINA';
 
-    // AL INICIAR
     window.onload = function() {
         document.getElementById('fecha').valueAsDate = new Date();
         cargarZonasEnSelect();
         actualizarSelectCuentas();
     };
 
-    // CAMBIO DE PESTAÑAS
     window.cambiarModo = function(modo) {
         window.MODO_ACTUAL = modo;
         const tabOficina = document.getElementById('tab-btn-oficina');
@@ -252,9 +326,10 @@
         actualizarSelectCuentas();
     }
 
-    // LISTAS DESPLEGABLES
     window.actualizarSelectCuentas = function() {
         const select = document.getElementById('cuenta');
+        // Guardar valor actual si existe para no perderlo al cambiar modo
+        const valorActual = select.value; 
         select.innerHTML = "";
         if (window.MODO_ACTUAL === 'OFICINA') {
             select.innerHTML = '<option value="LESLY">🏦 CAJA / CUENTA LESLY</option>';
@@ -265,6 +340,7 @@
                 <option value="JOSE_RODINDER">🏦 JOSE RODINDER GUARDADO PINEDA</option>
             `;
         }
+        if(valorActual) select.value = valorActual;
     }
 
     window.cargarZonasEnSelect = function() {
@@ -287,7 +363,6 @@
         document.getElementById('cobrador').value = opcion && opcion.value ? opcion.getAttribute('data-cobrador') : "";
     }
 
-    // PINTAR EL REPORTE (LLAMADO DESDE EL MODULE CUANDO HAY DATOS)
     window.pintarHTML = function(listaRegistros) {
         const contenedor = document.getElementById('contenedor-reportes');
         contenedor.innerHTML = ""; 
@@ -326,7 +401,10 @@
                             <td>${reg.cobrador}</td>
                             <td>${reg.ref}</td>
                             <td>L. ${reg.monto.toLocaleString('es-HN', {minimumFractionDigits: 2})}</td>
-                            <td class="no-print" style="text-align:center; cursor:pointer; color:red; font-weight:bold;" onclick="eliminarDeNube('${reg.idFirebase}')">×</td>
+                            <td class="no-print" style="white-space:nowrap; text-align:center;">
+                                <button class="btn-action btn-edit" onclick="cargarParaEditar('${reg.idFirebase}')" title="Editar">✏️</button>
+                                <button class="btn-action btn-delete" onclick="eliminarDeNube('${reg.idFirebase}')" title="Eliminar">🗑️</button>
+                            </td>
                         </tr>
                     `;
                 });
@@ -348,7 +426,7 @@
                         <h3 class="account-title">${config.titulo} <span>L. ${subtotalCuenta.toLocaleString('es-HN', {minimumFractionDigits: 2})}</span></h3>
                         <div style="overflow-x:auto;">
                             <table>
-                                <thead><tr><th>Orig.</th><th>Sem.</th><th>Fecha</th><th>Zona</th><th>Cobrador</th><th>Ref.</th><th>Monto</th><th class="no-print">X</th></tr></thead>
+                                <thead><tr><th>Orig.</th><th>Sem.</th><th>Fecha</th><th>Zona</th><th>Cobrador</th><th>Ref.</th><th>Monto</th><th class="no-print">Acción</th></tr></thead>
                                 <tbody>${filasHTML}</tbody>
                             </table>
                         </div>
