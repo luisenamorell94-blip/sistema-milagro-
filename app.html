@@ -3,94 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Milagro v4</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
+    <title>Sistema Milagro - Multifunción</title>
+    
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <style>
-        body { font-family: sans-serif; background: #f4f4f4; margin: 0; padding-bottom: 50px; }
-        header { background: #004d40; color: white; padding: 15px; text-align: center; }
-        .container { max-width: 800px; margin: 0 auto; padding: 10px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #eef2f5; margin: 0; padding: 10px; padding-bottom: 80px; }
         
-        .caja-blanca { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        /* PESTAÑAS PRINCIPALES */
+        .tabs { display: flex; gap: 5px; margin-bottom: 0; }
+        .tab { flex: 1; padding: 12px; text-align: center; cursor: pointer; font-weight: bold; border-radius: 8px 8px 0 0; background: #ccc; color: #555; transition: 0.3s; font-size: 0.9rem; }
         
-        label { display: block; margin-top: 10px; font-weight: bold; font-size: 0.9rem; }
-        input, select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        
-        /* BOTONES */
-        .btn-grande { width: 100%; padding: 15px; border: none; color: white; font-weight: bold; margin-top: 20px; border-radius: 5px; cursor: pointer; font-size: 1rem; }
-        .azul { background: #004d40; }
-        .naranja { background: #e65100; }
-        .rojo { background: #d32f2f; margin-top: 5px; display: none; } /* Boton cancelar */
+        /* COLORES DE PESTAÑAS */
+        .tab.active-oficina { background: #004d40; color: white; } /* Verde Oscuro */
+        .tab.active-campo { background: #e65100; color: white; }   /* Naranja */
+        .tab.active-contado { background: #4a148c; color: white; } /* Morado */
 
-        /* PESTAÑAS */
-        .tabs { display: flex; margin-bottom: 10px; }
-        .tab { flex: 1; padding: 10px; text-align: center; background: #ddd; cursor: pointer; font-weight: bold; }
-        .active-oficina { background: #004d40; color: white; }
-        .active-campo { background: #e65100; color: white; }
+        .card { background: white; padding: 20px; border-radius: 0 0 8px 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
 
+        label { display: block; margin-top: 10px; font-weight: bold; font-size: 0.85rem; color: #333; }
+        input, select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; font-size: 1rem; }
+        
+        button { width: 100%; padding: 15px; border: none; border-radius: 5px; font-weight: bold; color: white; cursor: pointer; margin-top: 15px; font-size: 1rem; }
+        .btn-oficina { background: #004d40; }
+        .btn-campo { background: #e65100; }
+        .btn-contado { background: #4a148c; }
+        .btn-cancelar { background: #757575; display: none; }
+        
         /* TABLA */
-        .tarjeta-registro { background: white; border-left: 5px solid #004d40; margin-top: 10px; padding: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .info { font-size: 0.9rem; }
-        .acciones button { margin-left: 5px; padding: 5px 10px; cursor: pointer; border: none; border-radius: 3px; }
-        .btn-editar { background: #2196F3; color: white; }
-        .btn-borrar { background: #F44336; color: white; }
+        table { width: 100%; border-collapse: collapse; background: white; font-size: 0.9rem; }
+        th, td { padding: 10px; border-bottom: 1px solid #eee; text-align: left; }
+        th { background: #f5f5f5; color: #333; }
+        
+        .fila-deposito { border-left: 4px solid #004d40; }
+        .fila-contado { border-left: 4px solid #4a148c; }
+        
+        .badge { padding: 3px 6px; border-radius: 4px; font-size: 0.75rem; color: white; font-weight: bold; }
+        .bg-verde { background: #004d40; }
+        .bg-morado { background: #4a148c; }
+
+        /* OCULTAR/MOSTRAR SECCIONES */
+        .hidden { display: none; }
+
+        /* ESTADO */
+        #status-bar { text-align: center; font-size: 0.8rem; color: #666; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-<header>
-    <h2>SISTEMA MILAGRO</h2>
-    <small id="estado">Conectando...</small>
-</header>
+    <h2 style="text-align:center; color:#333; margin-bottom:5px;">SISTEMA MULTIFUNCIÓN v5.0</h2>
+    <div id="status-bar">Conectando...</div>
 
-<div class="container">
-    
-    <div class="tabs">
-        <div id="tab1" class="tab active-oficina" onclick="cambiarModo('OFICINA')">🏢 OFICINA</div>
-        <div id="tab2" class="tab" onclick="cambiarModo('CAMPO')">🏍️ CAMPO</div>
+    <div class="container" style="max-width: 800px; margin: 0 auto;">
+        <div class="tabs">
+            <div id="tab-oficina" class="tab active-oficina" onclick="cambiarModo('OFICINA')">🏢 OFICINA</div>
+            <div id="tab-campo" class="tab" onclick="cambiarModo('CAMPO')">🏍️ CAMPO</div>
+            <div id="tab-contado" class="tab" onclick="cambiarModo('CONTADO')">📦 CONTADO</div>
+        </div>
+
+        <div class="card">
+            <div id="titulo-form" style="text-align:center; font-weight:bold; margin-bottom:15px; color:#004d40;">INGRESO DE DEPÓSITOS</div>
+            
+            <label>Fecha:</label>
+            <input type="date" id="fecha">
+
+            <div id="grupo-depositos">
+                <label>Semana:</label>
+                <select id="semana"><option>Semana 1</option><option>Semana 2</option><option>Semana 3</option><option>Semana 4</option><option>Semana 5</option></select>
+
+                <label>Referencia / Baucher:</label>
+                <input type="number" id="referencia" placeholder="Ej: 123456">
+
+                <label>Zona:</label>
+                <select id="zona" onchange="autoCobrador()"></select>
+                
+                <label>Cobrador:</label>
+                <input type="text" id="cobrador" readonly style="background:#eee;">
+
+                <label>Cuenta Destino:</label>
+                <select id="cuenta"></select>
+            </div>
+
+            <div id="grupo-contado" class="hidden">
+                <label>Vendedor (Tarjeta):</label>
+                <select id="vendedor_contado">
+                    <option value="">-- Seleccione Vendedor --</option>
+                    <option value="SANTOS">Santos</option>
+                    <option value="NOE">Noé</option>
+                    <option value="CARLOS">Carlos</option>
+                    <option value="RAMON">Ramón</option>
+                    <option value="ORLANDO">Orlando</option>
+                    <option value="DAVID">David</option>
+                </select>
+
+                <label>Artículo:</label>
+                <input type="text" id="articulo" placeholder="Ej: Cama matrimonial, Estufa...">
+            </div>
+
+            <label id="label-monto">Monto Depósito (L.):</label>
+            <input type="number" id="monto" placeholder="0.00">
+
+            <button id="btn-guardar" class="btn-oficina" onclick="guardar()">GUARDAR REGISTRO</button>
+            <button id="btn-cancelar" class="btn-cancelar" onclick="cancelarEdicion()">CANCELAR EDICIÓN</button>
+        </div>
+
+        <h3 id="titulo-tabla">Registros de la Semana</h3>
+        <div style="overflow-x: auto;">
+            <table>
+                <thead id="tabla-head">
+                    </thead>
+                <tbody id="tabla-body">
+                    </tbody>
+            </table>
+        </div>
+        <div style="text-align:right; font-weight:bold; font-size:1.2rem; margin-top:10px; padding:10px; background:#333; color:white;">
+            TOTAL: <span id="gran-total">L. 0.00</span>
+        </div>
     </div>
-
-    <div class="caja-blanca">
-        <h3 id="titulo-form" style="margin-top:0; text-align:center;">INGRESO DE DATOS</h3>
-        
-        <label>Semana:</label>
-        <select id="semana"><option>Semana 1</option><option>Semana 2</option><option>Semana 3</option><option>Semana 4</option><option>Semana 5</option></select>
-        
-        <label>Fecha:</label>
-        <input type="date" id="fecha">
-
-        <label>Referencia:</label>
-        <input type="number" id="referencia" placeholder="Número de recibo">
-
-        <label>Zona:</label>
-        <select id="zona" onchange="autoCompletar()"></select>
-
-        <label>Cobrador:</label>
-        <input type="text" id="cobrador" readonly style="background:#eee;">
-
-        <label>Cuenta Destino:</label>
-        <select id="cuenta"></select>
-
-        <label>Monto (L.):</label>
-        <input type="number" id="monto">
-
-        <button id="btn-guardar" class="btn-grande azul" onclick="guardar()">GUARDAR</button>
-        <button id="btn-cancelar" class="btn-grande rojo" onclick="cancelarEdicion()">CANCELAR EDICIÓN</button>
-    </div>
-
-    <div id="lista-registros" style="margin-top: 20px;"></div>
-    
-    <div style="text-align: right; font-size: 1.5rem; font-weight: bold; margin-top: 20px; padding: 10px; background: #333; color: white;">
-        TOTAL: <span id="total-global">L. 0.00</span>
-    </div>
-</div>
 
 <script>
-    // 1. CONFIGURACION DE FIREBASE
-    var firebaseConfig = {
+    // --- 1. CONFIGURACIÓN FIREBASE ---
+    const firebaseConfig = {
       apiKey: "AIzaSyAYJRmMQbV-j6hGfHCZyuCgtvmkY0C2L1g",
       authDomain: "ingreso-depositos.firebaseapp.com",
       databaseURL: "https://ingreso-depositos-default-rtdb.firebaseio.com",
@@ -99,18 +133,21 @@
       messagingSenderId: "788432921819",
       appId: "1:788432921819:web:b5f792eecbe4b7b00498fe"
     };
-    
-    // INICIAR FIREBASE
-    firebase.initializeApp(firebaseConfig);
-    var db = firebase.database();
-    
-    // VARIABLES GLOBALES
-    var MODO = "OFICINA";
-    var ID_EDITANDO = null;
-    var registros = [];
 
-    // DATOS FIJOS
-    var rutas = {
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    
+    // Referencias a las DOS carpetas de la base de datos
+    const refDepositos = db.ref('registros_milagro');
+    const refContado = db.ref('ventas_contado');
+
+    // --- 2. VARIABLES GLOBALES ---
+    let MODO = 'OFICINA'; // OFICINA, CAMPO, CONTADO
+    let ID_EDITANDO = null;
+    let listaDepositos = [];
+    let listaContado = [];
+
+    const rutas = {
         "MIGUEL": ["Elixir", "Saba Olanchito", "Zona Saba"],
         "ANGEL": ["Margen Izquierda", "Saba Tocoa"],
         "FERNANDO": ["Vicinia", "Trujillo", "Honduras Aguan"],
@@ -118,199 +155,251 @@
         "JORGE": ["Planes", "Jutiapa", "Sonaguera", "Faust"]
     };
 
-    // AL CARGAR LA PAGINA
+    // --- 3. INICIO ---
     window.onload = function() {
         document.getElementById('fecha').valueAsDate = new Date();
         llenarZonas();
-        actualizarCuentas();
-        
-        // ESCUCHAR DATOS DE FIREBASE
-        db.ref('registros_milagro').on('value', function(snapshot) {
-            registros = [];
-            var data = snapshot.val();
-            if(data) {
-                Object.keys(data).forEach(function(key) {
-                    registros.push({ id: key, ...data[key] });
-                });
-            }
-            pintarPantalla();
-            document.getElementById('estado').innerText = "🟢 Conectado";
+        cambiarModo('OFICINA'); // Iniciar en oficina
+
+        // ESCUCHAR DEPOSITOS
+        refDepositos.on('value', (snap) => {
+            listaDepositos = [];
+            const data = snap.val();
+            if(data) Object.keys(data).forEach(k => listaDepositos.push({id: k, ...data[k]}));
+            actualizarTabla();
         });
+
+        // ESCUCHAR VENTAS CONTADO
+        refContado.on('value', (snap) => {
+            listaContado = [];
+            const data = snap.val();
+            if(data) Object.keys(data).forEach(k => listaContado.push({id: k, ...data[k]}));
+            actualizarTabla();
+        });
+        
+        document.getElementById('status-bar').innerText = "🟢 Sistema Conectado y Listo";
     };
 
-    // FUNCION GUARDAR
-    function guardar() {
-        var sem = document.getElementById('semana').value;
-        var fec = document.getElementById('fecha').value;
-        var ref = document.getElementById('referencia').value;
-        var zon = document.getElementById('zona').value;
-        var cob = document.getElementById('cobrador').value;
-        var cue = document.getElementById('cuenta').value;
-        var mon = parseFloat(document.getElementById('monto').value);
+    // --- 4. CAMBIO DE MODO (LA MAGIA) ---
+    window.cambiarModo = function(nuevoModo) {
+        MODO = nuevoModo;
+        cancelarEdicion(); // Resetear formulario si cambiamos de pestaña
 
-        if(!zon || !cob || !ref || isNaN(mon)) {
-            alert("⚠️ Faltan datos por llenar");
-            return;
+        // 1. Estilos de Pestañas
+        document.getElementById('tab-oficina').className = `tab ${nuevoModo === 'OFICINA' ? 'active-oficina' : ''}`;
+        document.getElementById('tab-campo').className = `tab ${nuevoModo === 'CAMPO' ? 'active-campo' : ''}`;
+        document.getElementById('tab-contado').className = `tab ${nuevoModo === 'CONTADO' ? 'active-contado' : ''}`;
+
+        // 2. Visibilidad de Campos
+        const grupoDep = document.getElementById('grupo-depositos');
+        const grupoCon = document.getElementById('grupo-contado');
+        const titulo = document.getElementById('titulo-form');
+        const btn = document.getElementById('btn-guardar');
+        const lblMonto = document.getElementById('label-monto');
+
+        if (nuevoModo === 'CONTADO') {
+            // MODO CONTADO
+            grupoDep.classList.add('hidden');
+            grupoCon.classList.remove('hidden');
+            titulo.innerText = "REGISTRO DE TARJETAS (CONTADO)";
+            titulo.style.color = "#4a148c";
+            btn.className = "btn-contado";
+            btn.innerText = "GUARDAR VENTA CONTADO";
+            lblMonto.innerText = "Saldo de Contado (L.):";
+        } else {
+            // MODO DEPOSITOS (OFICINA O CAMPO)
+            grupoDep.classList.remove('hidden');
+            grupoCon.classList.add('hidden');
+            titulo.innerText = nuevoModo === 'OFICINA' ? "INGRESO OFICINA" : "INGRESO VENDEDORES";
+            titulo.style.color = nuevoModo === 'OFICINA' ? "#004d40" : "#e65100";
+            btn.className = nuevoModo === 'OFICINA' ? "btn-oficina" : "btn-campo";
+            btn.innerText = "GUARDAR DEPÓSITO";
+            lblMonto.innerText = "Monto Depósito (L.):";
+            actualizarCuentas();
         }
 
-        var datos = {
-            origen: MODO,
-            semana: sem, fecha: fec, ref: ref, zona: zon, cobrador: cob, cuenta: cue, monto: mon
-        };
+        actualizarTabla();
+    };
 
-        if(ID_EDITANDO) {
-            // ACTUALIZAR
-            db.ref('registros_milagro/' + ID_EDITANDO).update(datos, function(error) {
-                if(error) alert("Error: " + error);
-                else { alert("✅ Actualizado"); cancelarEdicion(); }
-            });
-        } else {
-            // GUARDAR NUEVO
-            // Verificar duplicado
-            var duplicado = registros.find(r => r.ref == ref);
-            if(duplicado) {
-                alert("⛔ CUIDADO: Esa referencia ya existe.");
-                return;
+    // --- 5. GUARDAR DATOS ---
+    window.guardar = function() {
+        const fecha = document.getElementById('fecha').value;
+        const monto = parseFloat(document.getElementById('monto').value);
+
+        if (isNaN(monto) || monto <= 0) { alert("Ingresa un monto válido"); return; }
+
+        if (MODO === 'CONTADO') {
+            // GUARDAR EN CONTADO
+            const vendedor = document.getElementById('vendedor_contado').value;
+            const articulo = document.getElementById('articulo').value;
+
+            if (!vendedor || !articulo) { alert("Falta vendedor o artículo"); return; }
+
+            const datos = { fecha, vendedor, articulo, monto };
+
+            if (ID_EDITANDO) {
+                refContado.child(ID_EDITANDO).update(datos).then(() => terminardoGuardado());
+            } else {
+                refContado.push(datos).then(() => terminardoGuardado());
             }
 
-            db.ref('registros_milagro').push(datos, function(error) {
-                if(error) alert("Error: " + error);
-                else {
-                    // Limpiar solo montos y ref
-                    document.getElementById('referencia').value = "";
-                    document.getElementById('monto').value = "";
-                    document.getElementById('referencia').focus();
-                }
+        } else {
+            // GUARDAR EN DEPOSITOS
+            const semana = document.getElementById('semana').value;
+            const refNum = document.getElementById('referencia').value;
+            const zona = document.getElementById('zona').value;
+            const cobrador = document.getElementById('cobrador').value;
+            const cuenta = document.getElementById('cuenta').value;
+
+            if (!zona || !refNum) { alert("Falta zona o referencia"); return; }
+
+            const datos = { origen: MODO, semana, fecha, ref: refNum, zona, cobrador, cuenta, monto };
+
+            if (ID_EDITANDO) {
+                refDepositos.child(ID_EDITANDO).update(datos).then(() => terminardoGuardado());
+            } else {
+                // Verificar duplicado solo si es nuevo
+                const existe = listaDepositos.find(r => r.ref == refNum);
+                if(existe) { alert("Referencia repetida"); return; }
+                refDepositos.push(datos).then(() => terminardoGuardado());
+            }
+        }
+    };
+
+    function terminardoGuardado() {
+        alert("✅ Guardado Exitosamente");
+        document.getElementById('monto').value = "";
+        document.getElementById('referencia').value = "";
+        document.getElementById('articulo').value = "";
+        
+        if(ID_EDITANDO) cancelarEdicion();
+    }
+
+    // --- 6. TABLA Y VISUALIZACIÓN ---
+    function actualizarTabla() {
+        const thead = document.getElementById('tabla-head');
+        const tbody = document.getElementById('tabla-body');
+        tbody.innerHTML = "";
+        let total = 0;
+
+        if (MODO === 'CONTADO') {
+            // TABLA DE CONTADO
+            document.getElementById('titulo-tabla').innerText = "Ventas Contado (Semana)";
+            thead.innerHTML = `<tr><th>Fecha</th><th>Vendedor</th><th>Artículo</th><th>Saldo</th><th>Acción</th></tr>`;
+            
+            // Ordenar y filtrar
+            const lista = [...listaContado].sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+            
+            lista.forEach(r => {
+                total += r.monto;
+                tbody.innerHTML += `
+                    <tr class="fila-contado">
+                        <td>${r.fecha}</td>
+                        <td><span class="badge bg-morado">${r.vendedor}</span></td>
+                        <td>${r.articulo}</td>
+                        <td>L. ${r.monto.toLocaleString()}</td>
+                        <td>
+                            <button style="padding:5px; width:auto; margin:0; background:#2196F3" onclick="editar('${r.id}', 'CONTADO')">✏️</button>
+                            <button style="padding:5px; width:auto; margin:0; background:#F44336" onclick="borrar('${r.id}', 'CONTADO')">🗑️</button>
+                        </td>
+                    </tr>`;
+            });
+
+        } else {
+            // TABLA DE DEPOSITOS
+            document.getElementById('titulo-tabla').innerText = "Depósitos Registrados";
+            thead.innerHTML = `<tr><th>Origen</th><th>Fecha</th><th>Zona/Ref</th><th>Monto</th><th>Acción</th></tr>`;
+            
+            const lista = [...listaDepositos].sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+
+            lista.forEach(r => {
+                total += r.monto;
+                const color = r.origen === 'OFICINA' ? 'bg-verde' : 'bg-naranja';
+                tbody.innerHTML += `
+                    <tr class="fila-deposito">
+                        <td><span class="badge ${color}">${r.origen}</span></td>
+                        <td>${r.fecha}</td>
+                        <td>${r.zona}<br><small>Ref: ${r.ref}</small></td>
+                        <td>L. ${r.monto.toLocaleString()}</td>
+                        <td>
+                            <button style="padding:5px; width:auto; margin:0; background:#2196F3" onclick="editar('${r.id}', 'DEPOSITO')">✏️</button>
+                            <button style="padding:5px; width:auto; margin:0; background:#F44336" onclick="borrar('${r.id}', 'DEPOSITO')">🗑️</button>
+                        </td>
+                    </tr>`;
             });
         }
+        document.getElementById('gran-total').innerText = "L. " + total.toLocaleString();
     }
 
-    // FUNCION BORRAR
-    window.borrar = function(id) {
-        if(confirm("¿Seguro que quieres eliminar este registro?")) {
-            db.ref('registros_milagro/' + id).remove();
+    // --- 7. EDITAR Y BORRAR ---
+    window.borrar = function(id, tipo) {
+        if(confirm("¿Eliminar registro?")) {
+            if (tipo === 'CONTADO') refContado.child(id).remove();
+            else refDepositos.child(id).remove();
         }
-    }
+    };
 
-    // FUNCION EDITAR
-    window.editar = function(id) {
-        var r = registros.find(item => item.id === id);
-        if(!r) return;
-
-        // Cargar datos al form
-        cambiarModo(r.origen);
-        document.getElementById('semana').value = r.semana;
-        document.getElementById('fecha').value = r.fecha;
-        document.getElementById('referencia').value = r.ref;
-        document.getElementById('zona').value = r.zona;
-        document.getElementById('cobrador').value = r.cobrador;
-        document.getElementById('cuenta').value = r.cuenta;
-        document.getElementById('monto').value = r.monto;
-
-        // Cambiar estado visual
+    window.editar = function(id, tipo) {
         ID_EDITANDO = id;
-        document.getElementById('btn-guardar').innerText = "ACTUALIZAR REGISTRO";
-        document.getElementById('btn-guardar').style.background = "#2196F3";
-        document.getElementById('btn-cancelar').style.display = "block";
-        document.getElementById('titulo-form').innerText = "✏️ EDITANDO REF: " + r.ref;
-        window.scrollTo(0,0);
-    }
+        document.getElementById('btn-cancelar').style.display = 'block';
+        document.getElementById('btn-guardar').innerText = "ACTUALIZAR DATOS";
 
-    // FUNCION CANCELAR EDICION
+        if (tipo === 'CONTADO') {
+            const r = listaContado.find(x => x.id === id);
+            cambiarModo('CONTADO'); // Asegurar que estamos en la pestaña correcta
+            document.getElementById('fecha').value = r.fecha;
+            document.getElementById('vendedor_contado').value = r.vendedor;
+            document.getElementById('articulo').value = r.articulo;
+            document.getElementById('monto').value = r.monto;
+        } else {
+            const r = listaDepositos.find(x => x.id === id);
+            cambiarModo(r.origen); // Cambiar a Oficina o Campo segun corresponda
+            document.getElementById('fecha').value = r.fecha;
+            document.getElementById('semana').value = r.semana;
+            document.getElementById('referencia').value = r.ref;
+            document.getElementById('zona').value = r.zona;
+            autoCobrador(); // Actualizar el cobrador automatico
+            document.getElementById('cuenta').value = r.cuenta;
+            document.getElementById('monto').value = r.monto;
+        }
+        window.scrollTo(0,0);
+    };
+
     window.cancelarEdicion = function() {
         ID_EDITANDO = null;
-        document.getElementById('referencia').value = "";
+        document.getElementById('btn-cancelar').style.display = 'none';
         document.getElementById('monto').value = "";
+        document.getElementById('referencia').value = "";
+        document.getElementById('articulo').value = "";
         
-        document.getElementById('btn-guardar').innerText = "GUARDAR";
-        document.getElementById('btn-guardar').style.background = MODO === 'OFICINA' ? "#004d40" : "#e65100";
-        document.getElementById('btn-cancelar').style.display = "none";
-        document.getElementById('titulo-form').innerText = "INGRESO DE DATOS";
-    }
+        // Restaurar botones visualmente
+        if(MODO === 'CONTADO') document.getElementById('btn-guardar').innerText = "GUARDAR VENTA CONTADO";
+        else document.getElementById('btn-guardar').innerText = "GUARDAR DEPÓSITO";
+    };
 
-    // FUNCIONES AUXILIARES
-    window.cambiarModo = function(modo) {
-        MODO = modo;
-        var btn = document.getElementById('btn-guardar');
-        var tab1 = document.getElementById('tab1');
-        var tab2 = document.getElementById('tab2');
-
-        if(modo === 'OFICINA') {
-            tab1.className = "tab active-oficina";
-            tab2.className = "tab";
-            if(!ID_EDITANDO) { btn.style.background = "#004d40"; btn.innerText = "GUARDAR (OFICINA)"; }
-        } else {
-            tab1.className = "tab";
-            tab2.className = "tab active-campo";
-            if(!ID_EDITANDO) { btn.style.background = "#e65100"; btn.innerText = "SUBIR (CAMPO)"; }
-        }
-        actualizarCuentas();
-    }
-
+    // --- 8. FUNCIONES AUXILIARES ---
     function llenarZonas() {
-        var select = document.getElementById('zona');
-        for (var cobrador in rutas) {
-            var optgroup = document.createElement('optgroup');
-            optgroup.label = cobrador;
-            rutas[cobrador].forEach(function(zona) {
-                var opt = document.createElement('option');
-                opt.value = zona;
-                opt.innerText = zona;
-                opt.setAttribute('data-cobrador', cobrador);
-                optgroup.appendChild(opt);
+        const sel = document.getElementById('zona');
+        for (const [cob, list] of Object.entries(rutas)) {
+            const grp = document.createElement('optgroup'); grp.label = cob;
+            list.forEach(z => {
+                const op = document.createElement('option'); op.value = z; op.innerText = z; op.setAttribute('data-c', cob);
+                grp.appendChild(op);
             });
-            select.appendChild(optgroup);
+            sel.appendChild(grp);
         }
     }
 
-    window.autoCompletar = function() {
-        var select = document.getElementById('zona');
-        var opt = select.options[select.selectedIndex];
-        document.getElementById('cobrador').value = opt.getAttribute('data-cobrador');
-    }
+    window.autoCobrador = function() {
+        const sel = document.getElementById('zona');
+        document.getElementById('cobrador').value = sel.options[sel.selectedIndex].getAttribute('data-c') || "";
+    };
 
     function actualizarCuentas() {
-        var sel = document.getElementById('cuenta');
-        var val = sel.value;
-        sel.innerHTML = "";
-        if(MODO === 'OFICINA') {
-            sel.innerHTML = "<option value='LESLY'>CUENTA LESLY</option>";
-        } else {
-            sel.innerHTML = "<option value='DAVID'>CUENTA DAVID</option><option value='DAVID_LESLY'>DAVID (VIA LESLY)</option><option value='JOSE_RODINDER'>JOSE RODINDER</option>";
-        }
-        sel.value = val;
-    }
-
-    function pintarPantalla() {
-        var contenedor = document.getElementById('lista-registros');
-        contenedor.innerHTML = "";
-        var total = 0;
-
-        // Ordenar por fecha (más reciente primero)
-        registros.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
-
-        registros.forEach(function(reg) {
-            total += reg.monto;
-            
-            var colorBorde = reg.origen === 'OFICINA' ? '#004d40' : '#e65100';
-            
-            var html = `
-            <div class="tarjeta-registro" style="border-left-color: ${colorBorde}">
-                <div class="info">
-                    <strong>${reg.zona}</strong> (${reg.cobrador})<br>
-                    Ref: <b>${reg.ref}</b> | ${reg.fecha}<br>
-                    Destino: ${reg.cuenta}<br>
-                    <span style="color:green; font-weight:bold; font-size:1.1rem">L. ${reg.monto.toLocaleString()}</span>
-                </div>
-                <div class="acciones">
-                    <button class="btn-editar" onclick="editar('${reg.id}')">✏️</button>
-                    <button class="btn-borrar" onclick="borrar('${reg.id}')">🗑️</button>
-                </div>
-            </div>`;
-            contenedor.innerHTML += html;
-        });
-
-        document.getElementById('total-global').innerText = "L. " + total.toLocaleString();
+        const sel = document.getElementById('cuenta');
+        sel.innerHTML = MODO === 'OFICINA' 
+            ? "<option value='LESLY'>CUENTA LESLY</option>" 
+            : "<option value='DAVID'>CUENTA DAVID</option><option value='DAVID_LESLY'>DAVID (VIA LESLY)</option><option value='JOSE_RODINDER'>JOSE RODINDER</option>";
     }
 </script>
 
