@@ -9,7 +9,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
 
-    <title>Sistema Milagro | v57 Historial + Edición</title>
+    <title>Sistema Milagro | v58 Corrección</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -100,6 +100,10 @@
             .pdf-table th, .pdf-table td { border-bottom: 1px dotted #ccc; padding: 3px; text-align: left; }
             .pdf-summary-container { width: 100%; max-width: 400px; margin-left: auto; margin-top: 10px; border: 2px solid #333; padding: 10px; background: #fdfdfd; page-break-inside: avoid; }
             .pdf-sum-row { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 12px; }
+            .pdf-sum-row.plus { color: #27ae60; font-weight: bold; border-bottom: 1px solid #eee; padding-bottom: 3px; }
+            .pdf-sum-row.minus { color: #c0392b; }
+            .pdf-neto-box { border-top: 3px double #333; margin-top: 5px; padding-top: 5px; font-size: 16px; font-weight: bold; color: #2c3e50; text-align: right; background: #eaf2f8; padding: 5px; }
+            .pdf-pressure-box { border: 2px solid #2c3e50; background: #f4f6f7; padding: 5px; margin-top: 10px; text-align: center; font-size: 12px; page-break-inside: avoid; }
             .pdf-inv-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; background: #f4f6f7; padding: 5px; border: 1px solid #ddd; font-size: 10px; text-align: center; margin-top: 10px; page-break-inside: avoid; }
             .pdf-inv-item b { display: block; font-size: 12px; margin-bottom: 2px; }
             .pdf-compact-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; font-size: 10px; border: 1px solid #ccc; padding: 5px; background: #fff; page-break-inside: avoid; }
@@ -178,14 +182,11 @@
     </div>
 
     <div class="tabs" id="tabs-admin">
-        <button class="tab-btn active" onclick="nav('cuadre')">📝 Liquidación</button>
-        <button class="tab-btn" onclick="nav('historial')">🗂️ Historial</button>
-        <button class="tab-btn" onclick="nav('stats')">📊 Estadísticas</button>
-        <button class="tab-btn" onclick="nav('usuarios')">👥 Usuarios</button>
-        <button class="tab-btn" onclick="nav('base')">🗃️ Base Datos</button>
-    </div>
-    <div class="tabs" id="tabs-cobrador" style="display:none;">
-        <button class="tab-btn active" style="background:var(--accent); color:white;">📈 Mi Rendimiento</button>
+        <button class="tab-btn active" onclick="nav('cuadre', this)">📝 Liquidación</button>
+        <button class="tab-btn" onclick="nav('historial', this)">🗂️ Historial</button>
+        <button class="tab-btn" onclick="nav('stats', this)">📊 Estadísticas</button>
+        <button class="tab-btn" onclick="nav('usuarios', this)">👥 Usuarios</button>
+        <button class="tab-btn" onclick="nav('base', this)">🗃️ Base Datos</button>
     </div>
 
     <div id="view-cuadre" class="view-section active">
@@ -206,11 +207,6 @@
             <h3 style="margin:0 0 10px 0; color:var(--money);">1. Ingresos</h3>
             <div id="lista-talonarios"></div>
             <button class="btn-add" onclick="addTal()">+ Agregar Talonario</button>
-            <div style="margin-top:15px; padding:10px; background:white; border-radius:5px; border:1px solid #ddd;">
-                <label style="font-size:0.8em; font-weight:bold; color:#555;">EFICIENCIA DE COBRO</label>
-                <div class="efficiency-text" id="eff-text">Cobraste 0 de 0 (0%)</div>
-                <div class="efficiency-bar"><div class="efficiency-fill" id="eff-bar"></div></div>
-            </div>
             <div style="text-align:right; font-weight:bold; margin-top:10px; font-size:1.1em; color:var(--money);">Total Recaudado: <span id="lbl_tal">L. 0.00</span></div>
         </div>
 
@@ -219,13 +215,11 @@
             <label style="font-weight:bold; font-size:0.9em;">A. Gastos Operativos</label>
             <div id="lista-gastos"></div>
             <button class="btn-add" onclick="addGas()">+ Gasto</button>
-            <div style="margin-top:5px;"><input type="file" id="in-gas-pic" accept="image/*" multiple hidden onchange="procPic(this, 'gal-gas')"><button class="btn-cam" onclick="document.getElementById('in-gas-pic').click()">📷 FOTOS GASTOS</button><div id="gal-gas" class="gallery"></div></div>
             <div style="text-align:right; font-weight:bold; margin:5px 0 15px 0; color:#c0392b;">Subtotal Gastos: <span id="lbl_gas">L. 0.00</span></div>
             <hr style="border:0; border-top:1px dashed #ccc; margin:10px 0;">
             <label style="font-weight:bold; font-size:0.9em; color:var(--bank);">B. Depósitos Banco</label>
             <div id="lista-banco"></div>
             <button class="btn-add" onclick="addBan()">+ Voucher</button>
-            <div style="margin-top:5px;"><input type="file" id="in-ban-pic" accept="image/*" multiple hidden onchange="procPic(this, 'gal-ban')"><button class="btn-cam" onclick="document.getElementById('in-ban-pic').click()" style="background:var(--bank);">📷 FOTOS BANCO</button><div id="gal-ban" class="gallery"></div></div>
             <div style="text-align:right; font-weight:bold; margin-top:5px; color:var(--bank);">Subtotal Banco: <span id="lbl_ban">L. 0.00</span></div>
         </div>
 
@@ -323,18 +317,6 @@
             <div style="max-height:400px; overflow-y:scroll; margin-top:10px;"><table class="data-table" id="table-db"><thead><tr><th>Clave</th><th>#</th><th>Acción</th></tr></thead><tbody id="db-body"></tbody></table></div>
         </div>
     </div>
-    
-    <div id="view-dashboard" class="view-section">
-        <div class="card">
-            <div style="border-bottom:1px solid #eee; margin-bottom:15px; padding-bottom:10px;"><h3>Hola, <span id="dash-name"></span> 👋</h3><p style="margin:0;">Zona: <strong id="dash-zona"></strong></p><div style="margin-top:10px; background:#f0f0f0; padding:10px; border-radius:5px;"><label style="font-size:0.7em; font-weight:bold;">FILTRAR</label><div style="display:flex; gap:5px; margin-top:5px;"><div style="flex:1"><span class="lbl-small">Desde:</span><input type="date" id="dash-start" onchange="cargarDash()"></div><div style="flex:1"><span class="lbl-small">Hasta:</span><input type="date" id="dash-end" onchange="cargarDash()"></div></div></div></div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:15px; text-align:center;">
-                <div style="flex:1; background:var(--accent); color:white; padding:10px; border-radius:8px; margin-right:5px;"><span id="kpi-cobradas" style="font-size:1.5em; font-weight:bold; display:block;">0 / 0</span><small>Cobradas</small></div>
-                <div style="flex:1; background:var(--blue); color:white; padding:10px; border-radius:8px; margin-left:5px;"><span id="kpi-com" style="font-size:1.5em; font-weight:bold; display:block;">L.0</span><small>Mi Comisión</small></div>
-            </div>
-            <div style="text-align:center; margin-bottom:20px;"><span style="font-size:2em; font-weight:bold; color:#333;" id="kpi-recaudo">L. 0.00</span><br><small>RECAUDADO</small></div>
-            <h4 style="margin-bottom:5px;">📝 Detalle</h4><div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>Fecha</th><th>Tarjetas</th><th>Recaudo</th><th>Comisión</th></tr></thead><tbody id="dash-history-body"></tbody></table></div>
-        </div>
-    </div>
 </div>
 
 <div id="seccion-impresion">
@@ -344,7 +326,7 @@
     <div class="pdf-summary-container"><div style="text-align:center; font-weight:bold; border-bottom:1px solid #ccc; margin-bottom:10px;">LIQUIDACIÓN FINAL</div><div class="pdf-sum-row plus"><span>(+) TOTAL RECAUDADO</span><span id="p-rec">L. 0.00</span></div><div class="pdf-sum-row minus pdf-comision-box"><span>(-) COMISIÓN COBRADOR (10%)</span><span id="p-com">L. 0.00</span></div><div class="pdf-sum-row minus"><span>(-) TOTAL GASTOS</span><span id="p-gas">L. 0.00</span></div><div class="pdf-sum-row minus"><span>(-) TOTAL BANCO</span><span id="p-ban">L. 0.00</span></div><div class="pdf-neto-box">(=) NETO A ENTREGAR: <span id="p-neto">L. 0.00</span></div></div>
     <div class="pdf-pressure-box"><b>EFICIENCIA DE COBRO:</b><br>Se cobraron <span id="p-cob" style="font-size:16px; font-weight:bold;">0</span> tarjetas de un total de <span id="p-tot">0</span> en ruta.<br>Tarjetas sin cobro: <span id="p-nocob" style="color:red; font-weight:bold;">0</span></div>
     <div class="pdf-title" style="margin-top:20px;">IV. CONTROL DE INVENTARIO</div><div class="pdf-inv-grid"><div class="pdf-inv-item"><b id="p-sys">0</b>Base</div><div class="pdf-inv-item"><b id="p-new" style="color:green;">0</b>(+)Nuevas</div><div class="pdf-inv-item"><b id="p-baj" style="color:red;">0</b>(-)Cancel</div><div class="pdf-inv-item"><b id="p-recog" style="color:orange;">0</b>(-)Recog</div><div class="pdf-inv-item" style="background:#eee;"><b id="p-teo">0</b>Teórico</div><div class="pdf-inv-item" style="border:2px solid #333;"><b id="p-fis">0</b>Físico</div></div><div style="text-align:center; margin-top:5px; font-weight:bold;" id="p-msg"></div>
-    <div class="pdf-title" style="margin-top:20px;">V. DETALLE DE TARJETAS RETIRADAS</div><div id="p-grid-bajas" class="pdf-compact-grid"></div><div class="pdf-title" style="margin-top:20px;">VI. TARJETAS NUEVAS INGRESADAS</div><div id="p-grid-nuevas" class="pdf-compact-grid"></div><div class="pdf-evidence-section"><div id="p-gal-mixed"></div></div><div class="pdf-signatures"><div class="sign-line">Firma Cobrador</div><div class="sign-line">Firma Recibido</div></div>
+    <div class="pdf-title" style="margin-top:20px;">V. DETALLE DE TARJETAS RETIRADAS</div><div id="p-grid-bajas" class="pdf-compact-grid"></div><div class="pdf-title" style="margin-top:20px;">VI. TARJETAS NUEVAS INGRESADAS</div><div id="p-grid-nuevas" class="pdf-compact-grid"></div>
 </div>
 
 <script type="module">
@@ -352,8 +334,8 @@
     import { getFirestore, collection, addDoc, getDocs, query, where, deleteDoc, doc, orderBy, limit, writeBatch, updateDoc, getDoc } 
     from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-    // --- VERSION 57 (Estable + Historial/Edición) ---
-    const VERSION_ACTUAL = "57.0"; 
+    // --- VERSION 58 (BUG FIXES) ---
+    const VERSION_ACTUAL = "58.0"; 
 
     const firebaseConfig = { apiKey: "AIzaSyAXqQgW1goVNrNUVo6DSBBI9mutO4jvgqU", authDomain: "sistema-inventario-tarjetas.firebaseapp.com", projectId: "sistema-inventario-tarjetas", storageBucket: "sistema-inventario-tarjetas.firebasestorage.app", messagingSenderId: "44500678697", appId: "1:44500678697:web:c8559caa8e66a293d4c438", measurementId: "G-8W1DYQP0G3" };
     const app = initializeApp(firebaseConfig);
@@ -365,15 +347,9 @@
     let adminChartInst = null;
     let allCardsCache = []; 
     let sessionNewCards = [];
-    let idReporteEditando = null; // Variable clave para el modo edición
+    let idReporteEditando = null; 
 
-    // --- SEGURIDAD: PREGUNTAR ANTES DE SALIR ---
-    window.onbeforeunload = function() {
-        if (document.getElementById('lbl_tal') && document.getElementById('lbl_tal').innerText !== "L. 0.00") {
-            return "¿Seguro que quieres salir? Los cambios no guardados se perderán.";
-        }
-    };
-
+    // --- CHECK VERSION Y ARRANQUE ---
     window.addEventListener('load', async () => {
         const storedVer = localStorage.getItem('milagro_version');
         if (storedVer !== VERSION_ACTUAL) {
@@ -389,10 +365,8 @@
         if(saved) loginSuccess(saved);
         
         const now = new Date();
-        const firstDay = new Date(now.getFullYear(), 0, 1);
-        if(document.getElementById('dash-start')) document.getElementById('dash-start').value = firstDay.toISOString().split('T')[0];
-        if(document.getElementById('dash-end')) document.getElementById('dash-end').value = now.toISOString().split('T')[0];
-        if(document.getElementById('hist-start')) document.getElementById('hist-start').value = now.toISOString().split('T')[0];
+        const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+        if(document.getElementById('hist-start')) document.getElementById('hist-start').value = firstDay.toISOString().split('T')[0];
         if(document.getElementById('hist-end')) document.getElementById('hist-end').value = now.toISOString().split('T')[0];
         
         setTimeout(cargarBorrador, 1000);
@@ -400,7 +374,7 @@
         document.body.addEventListener('change', guardarBorrador);
     });
 
-    // --- MÓDULO HISTORIAL Y EDICIÓN ---
+    // --- MÓDULO HISTORIAL Y EDICIÓN (REPARADO) ---
     window.buscarReportes = async () => {
         const fStart = document.getElementById('hist-start').value;
         const fEnd = document.getElementById('hist-end').value;
@@ -409,7 +383,7 @@
         
         if(!zona) return alert("Selecciona una zona arriba primero.");
         
-        list.innerHTML = "<div style='text-align:center;'>Cargando reportes...</div>";
+        list.innerHTML = "<div class='spinner' style='margin:0 auto;'></div>";
         const start = new Date(fStart + "T00:00:00");
         const end = new Date(fEnd + "T23:59:59");
         
@@ -419,26 +393,30 @@
         let reportes = [];
         snap.forEach(doc => {
             const d = doc.data();
-            const f = d.fecha.toDate();
-            if(f >= start && f <= end) reportes.push({id: doc.id, ...d});
+            // FIX: Prevenir que reportes viejos sin fecha rompan la búsqueda
+            let f = new Date(); 
+            if(d.fecha && d.fecha.toDate) f = d.fecha.toDate();
+            else if (d.fecha) f = new Date(d.fecha);
+            
+            if(f >= start && f <= end) reportes.push({id: doc.id, fechaObj: f, ...d});
         });
         
-        reportes.sort((a,b) => b.fecha - a.fecha);
+        reportes.sort((a,b) => b.fechaObj - a.fechaObj);
         list.innerHTML = "";
         
         if(reportes.length === 0) { list.innerHTML = "<div style='text-align:center; padding:20px; color:#666;'>No hay reportes en estas fechas.</div>"; return; }
         
         reportes.forEach(r => {
-            const fechaStr = r.fecha.toDate().toLocaleDateString('es-HN');
+            const fechaStr = r.fechaObj.toLocaleDateString('es-HN');
             list.innerHTML += `
             <div class="card" style="border-left: 5px solid ${r.detalles_json ? 'var(--primary)' : '#ccc'};">
                 <div style="display:flex; justify-content:space-between;">
                     <strong>📅 ${fechaStr}</strong>
-                    <span style="color:var(--money); font-weight:bold;">L. ${r.neto.toLocaleString()}</span>
+                    <span style="color:var(--money); font-weight:bold;">L. ${(r.neto || 0).toLocaleString()}</span>
                 </div>
-                <div style="font-size:0.8em; color:#666; margin-top:5px;">Semana: ${r.semana || '-'} | Usuario: ${r.usuario}</div>
+                <div style="font-size:0.8em; color:#666; margin-top:5px;">Semana: ${r.semana || '-'} | Usuario: ${r.usuario || '-'}</div>
                 <div style="margin-top:10px; display:flex; gap:10px;">
-                    ${r.detalles_json ? `<button class="btn-edit" onclick="cargarParaEditar('${r.id}')">✏️ VER / EDITAR</button>` : `<small style="color:#999; font-style:italic;">Reporte antiguo sin detalle</small>`}
+                    ${r.detalles_json ? `<button class="btn-edit" onclick="cargarParaEditar('${r.id}')">✏️ CARGAR REPORTE</button>` : `<small style="color:#999; font-style:italic;">Reporte antiguo sin detalle</small>`}
                     <button class="btn-del-row" onclick="borrarReporte('${r.id}')">🗑️ BORRAR</button>
                 </div>
             </div>`;
@@ -458,33 +436,34 @@
                 if(data.detalles_json) {
                     const det = JSON.parse(data.detalles_json);
                     
-                    // Llenar HTML
-                    document.getElementById('lista-talonarios').innerHTML = det.talonarios;
-                    document.getElementById('lista-gastos').innerHTML = det.gastos;
-                    document.getElementById('lista-banco').innerHTML = det.banco;
+                    document.getElementById('lista-talonarios').innerHTML = det.talonarios || "";
+                    document.getElementById('lista-gastos').innerHTML = det.gastos || "";
+                    document.getElementById('lista-banco').innerHTML = det.banco || "";
                     
-                    // Llenar inputs sueltos
-                    document.getElementById('fecha_liquidacion').value = det.inputs.fecha;
-                    document.getElementById('txt_semana').value = det.inputs.semana;
-                    document.getElementById('inv-new').value = det.inputs.invNew;
-                    document.getElementById('inv-baj').value = det.inputs.invBaj;
-                    document.getElementById('inv-rec').value = det.inputs.invRec;
-                    document.getElementById('inv-fis').value = det.inputs.invFis;
+                    if(det.inputs) {
+                        document.getElementById('fecha_liquidacion').value = det.inputs.fecha || "";
+                        document.getElementById('txt_semana').value = det.inputs.semana || "";
+                        document.getElementById('inv-new').value = det.inputs.invNew || "";
+                        document.getElementById('inv-baj').value = det.inputs.invBaj || "";
+                        document.getElementById('inv-rec').value = det.inputs.invRec || "";
+                        document.getElementById('inv-fis').value = det.inputs.invFis || "";
+                    }
                     
-                    // Restaurar los valores visuales de los inputs dinámicos
+                    // FIX: Recuperar los valores de los inputs inyectados por innerHTML
                     document.querySelectorAll('#lista-talonarios input, #lista-gastos input, #lista-banco input, #lista-banco select').forEach(i => { 
-                        if(i.getAttribute('value')) i.value = i.getAttribute('value'); 
+                        if(i.getAttribute('value')) { i.value = i.getAttribute('value'); }
                     });
 
-                    // Modo edición UI
                     idReporteEditando = id;
                     document.getElementById('edit-mode-banner').style.display = 'block';
                     document.getElementById('btn-save-main').innerText = "💾 ACTUALIZAR REPORTE";
                     document.getElementById('btn-save-main').style.background = "var(--edit)";
                     
-                    nav('cuadre');
+                    nav('cuadre', document.querySelector('.tab-btn:first-child'));
                     window.calc();
-                    alert("✅ Reporte cargado. Puedes editarlo o darle a 'GENERAR PDF' para reimprimirlo.");
+                    alert("✅ Reporte cargado.\nPuedes corregir números y darle a 'ACTUALIZAR', o darle a 'GENERAR PDF' para reimprimir.");
+                } else {
+                    alert("Este reporte no contiene información detallada guardada.");
                 }
             }
         } catch(e) { alert("Error cargando reporte: " + e.message); }
@@ -509,7 +488,7 @@
         } catch (e) { alert("Error: " + e.message); }
     };
 
-    // --- GUARDAR Y ACTUALIZAR DATOS ---
+    // --- GUARDAR Y ACTUALIZAR DATOS (REPARADO) ---
     window.saveData = async () => {
         const accion = idReporteEditando ? "ACTUALIZAR" : "GUARDAR NUEVO";
         if(!confirm(`¿${accion} Reporte de Liquidación?`)) return;
@@ -521,7 +500,11 @@
             const c = calc(); 
             const fi = parseInt(document.getElementById('inv-fis').value)||0;
             
-            // TOMAR "FOTO" DE LOS DETALLES PARA EL HISTORIAL
+            // FIX IMPORTANTE: Antes de hacer la foto (innerHTML), forzar que los inputs tengan el atributo 'value'
+            document.querySelectorAll('#view-cuadre input, #view-cuadre select').forEach(i => {
+                if(i.type !== 'file') i.setAttribute('value', i.value);
+            });
+
             const detalles = {
                 talonarios: document.getElementById('lista-talonarios').innerHTML,
                 gastos: document.getElementById('lista-gastos').innerHTML,
@@ -542,30 +525,25 @@
                 recaudado: c.r, comision: c.c, gastos: c.g, depositos: c.b, neto: c.n,
                 inv_fisico: fi, semana: document.getElementById('txt_semana').value, usuario: currentUser.username,
                 tarjetas_cobradas: c.cobradas, total_ruta: totalSys,
-                detalles_json: JSON.stringify(detalles) // AQUI SE GUARDA LA FOTO
+                detalles_json: JSON.stringify(detalles) 
             };
 
             if(idReporteEditando) {
-                // ACTUALIZA EL VIEJO
                 await updateDoc(doc(db, "historial_cortes", idReporteEditando), dataToSave);
                 alert("✅ Reporte ACTUALIZADO con éxito."); 
                 cancelarEdicion();
             } else {
-                // CREA UNO NUEVO
                 await addDoc(collection(db, "historial_cortes"), dataToSave);
                 alert("✅ Reporte GUARDADO con éxito."); 
                 window.limpiarBorrador();
             }
-            
-        } catch(e) {
-            alert("Error al guardar: " + e.message);
-        }
+        } catch(e) { alert("Error al guardar: " + e.message); }
         overlay.style.display = 'none';
     };
 
     // --- SISTEMA ANTI-OLVIDO ---
     window.guardarBorrador = () => {
-        if(!currentUser || currentUser.role !== 'admin' || idReporteEditando) return; // No hacer backup si estamos editando
+        if(!currentUser || currentUser.role !== 'admin' || idReporteEditando) return; 
         document.querySelectorAll('input, select').forEach(i => {
             if(i.type !== 'checkbox' && i.type !== 'radio' && i.type !== 'file') i.setAttribute('value', i.value);
         });
@@ -583,11 +561,11 @@
             },
             nuevasSession: sessionNewCards
         };
-        localStorage.setItem('milagro_backup_v57', JSON.stringify(borrador));
+        localStorage.setItem('milagro_backup_v58', JSON.stringify(borrador));
     };
 
     window.cargarBorrador = () => {
-        const backup = localStorage.getItem('milagro_backup_v57');
+        const backup = localStorage.getItem('milagro_backup_v58');
         if(backup && currentUser && currentUser.role === 'admin') {
             const data = JSON.parse(backup);
             if(data.talonarios || data.gastos || data.banco || data.inputs.invFis) {
@@ -615,7 +593,7 @@
     };
 
     window.limpiarBorrador = () => {
-        localStorage.removeItem('milagro_backup_v57');
+        localStorage.removeItem('milagro_backup_v58');
         document.getElementById('lista-talonarios').innerHTML = "";
         document.getElementById('lista-gastos').innerHTML = "";
         document.getElementById('lista-banco').innerHTML = "";
@@ -628,7 +606,7 @@
         calc();
     };
 
-    // --- RESTO DEL SISTEMA (LOGIN, NAVEGACION, ETC) ---
+    // --- RESTO DEL SISTEMA ---
     window.iniciarSesion = async () => {
         const u = document.getElementById('loginUser').value.trim();
         const p = document.getElementById('loginPass').value.trim();
@@ -655,36 +633,28 @@
 
         if(user.role==='admin') {
             document.getElementById('tabs-admin').style.display='flex';
-            document.getElementById('tabs-cobrador').style.display='none';
-            nav('cuadre'); loadUsers();
-        } else {
-            document.getElementById('tabs-admin').style.display='none';
-            document.getElementById('tabs-cobrador').style.display='flex';
-            document.getElementById('view-cuadre').remove();
-            document.getElementById('view-base').remove();
-            document.getElementById('view-usuarios').remove();
-            document.getElementById('view-stats').remove();
-            document.getElementById('view-historial').remove();
-            document.getElementById('view-dashboard').classList.add('active');
-            setTimeout(() => { const firstZone = document.getElementById('zonaSelect').value; if(firstZone) cargarDash(); }, 500);
-        }
+            nav('cuadre', document.querySelector('.tab-btn')); loadUsers();
+        } 
         cargarDatos();
         if(document.getElementById('fecha_liquidacion')) document.getElementById('fecha_liquidacion').valueAsDate=new Date();
-        if(document.getElementById('lista-talonarios')) { addTal(); addGas(); addBan(); }
+        if(document.getElementById('lista-talonarios') && document.getElementById('lista-talonarios').innerHTML.trim() === "") { addTal(); addGas(); addBan(); }
     }
     
     window.logout = () => { sessionStorage.clear(); location.reload(); };
-    window.nav = (p) => { 
+    
+    // FIX Pestañas Visibles
+    window.nav = (p, btn) => { 
         document.querySelectorAll('.view-section').forEach(e=>e.classList.remove('active')); 
         document.querySelectorAll('.tab-btn').forEach(e=>e.classList.remove('active')); 
         if(document.getElementById('view-'+p)) document.getElementById('view-'+p).classList.add('active');
+        if(btn) btn.classList.add('active');
         if(p === 'stats') loadAdminStats();
     };
 
     document.getElementById('zonaSelect').addEventListener('change', ()=>{ 
         const activeView = document.querySelector('.view-section.active').id;
-        if(currentUser.role==='cobrador') cargarDash(); 
-        else if (activeView === 'view-stats') loadAdminStats();
+        if (activeView === 'view-stats') loadAdminStats();
+        else if (activeView === 'view-historial') buscarReportes();
         else cargarDatos(); 
     });
 
@@ -697,7 +667,7 @@
         snap.forEach(d => { allCardsCache.push({ id: d.id, ...d.data() }); }); 
         if(document.getElementById('total-sys')) document.getElementById('total-sys').innerText=totalSys; 
         if(document.getElementById('db-total-count')) document.getElementById('db-total-count').innerText=totalSys; 
-        if(currentUser.role==='admin') { 
+        if(currentUser && currentUser.role==='admin') { 
             const tbody = document.getElementById('db-body'); tbody.innerHTML=""; 
             allCardsCache.forEach(d => { tbody.innerHTML += `<tr id="tr-${d.id}"><td>${d.clave}</td><td>${d.numero}</td><td><button class="btn-del-row" onclick="delRow('${d.id}')">Borrar</button></td></tr>`; }); 
         } 
@@ -708,12 +678,11 @@
         await addDoc(collection(db, "historial_tarjetas"), { fecha: new Date(), zona: zona, clave: clave, numero: numero, accion: accion, usuario: currentUser.username });
     }
 
-    // --- LOGICA DE LIQUIDACION ---
+    // --- LOGICA DE LIQUIDACION Y CALCULOS ---
     window.addTal = () => { document.getElementById('lista-talonarios').insertAdjacentHTML('beforeend', `<div class="item-container"><div class="dynamic-row"><div style="flex:1"><span class="lbl-small">#Tal</span><input class="tal-id"></div><div style="flex:1"><span class="lbl-small">Del</span><input type="number" class="tal-del" oninput="updRow(this)"></div><div style="flex:1"><span class="lbl-small">Al</span><input type="number" class="tal-al" oninput="updRow(this)"></div><div style="flex:1"><span class="lbl-small">Max</span><input type="number" class="tal-max" value="50" oninput="updRow(this)"></div></div><div class="dynamic-row"><div style="flex:2"><span class="lbl-small">Monto L.</span><input type="number" class="monto-tal" oninput="calc()"></div><button class="btn-del" onclick="this.parentElement.parentElement.remove();calc()">X</button></div><div class="lbl-small row-inf"></div></div>`); };
     window.addGas = () => { document.getElementById('lista-gastos').insertAdjacentHTML('beforeend', `<div class="dynamic-row item-gas"><input class="desc-gas" placeholder="Descripción" style="flex:2"><input type="number" class="monto-gas" placeholder="L." style="flex:1" oninput="calc()"><button class="btn-del" onclick="this.parentElement.remove();calc()">X</button></div>`); };
     window.addBan = () => { document.getElementById('lista-banco').insertAdjacentHTML('beforeend', `<div class="item-container item-ban"><div class="dynamic-row"><select class="b-banc" style="flex:1"><option>Atlántida</option><option>BAC</option><option>Occidente</option><option>Ficohsa</option><option>Banpais</option></select><select class="b-cta" style="flex:1"><option>Jose Rodinder Guardado</option><option>Angel David Guardado</option></select></div><div class="dynamic-row"><div style="flex:1"><span class="lbl-small">Ref/Voucher</span><input class="b-ref"></div><div style="flex:1"><span class="lbl-small">Fecha</span><input type="date" class="b-date"></div></div><div class="dynamic-row"><div style="flex:2"><span class="lbl-small">Monto L.</span><input type="number" class="monto-ban" oninput="calc()"></div><button class="btn-del" onclick="this.parentElement.parentElement.remove();calc()">X</button></div></div>`); };
     window.updRow = (el) => { const p = el.closest('.item-container'); let del=parseInt(p.querySelector('.tal-del').value)||0, al=parseInt(p.querySelector('.tal-al').value)||0; if(del>0 && al>=del) { p.querySelector('.row-inf').innerHTML = `Usados: <b>${al-del+1}</b>`; } window.calc(); };
-    window.procPic = (inp, divId) => { if(inp.files.length) Array.from(inp.files).forEach(f=>{ let r=new FileReader(); r.onload=(e)=>{ document.getElementById(divId).innerHTML+=`<div class="thumb"><img src="${e.target.result}"><button class="thumb-x" onclick="this.parentElement.remove()">X</button></div>`; }; r.readAsDataURL(f); }); inp.value=''; };
     
     window.calc = () => { 
         let r=0, g=0, b=0, tc=0;
@@ -728,13 +697,13 @@
         document.querySelectorAll('.monto-ban').forEach(i=>b+=parseFloat(i.value)||0); 
         let c = r * 0.10; let n = r - c - g - b; 
         
-        ['lbl_tal','res_ing'].forEach(id=>document.getElementById(id).innerText="L. "+r.toFixed(2)); 
-        ['lbl_gas','res_gas'].forEach(id=>document.getElementById(id).innerText="L. "+g.toFixed(2)); 
-        ['lbl_ban','res_ban'].forEach(id=>document.getElementById(id).innerText="L. "+b.toFixed(2)); 
-        document.getElementById('res_com').innerText="L. "+c.toFixed(2); 
-        ['res_neto'].forEach(id=>document.getElementById(id).innerText="L. "+n.toFixed(2)); 
+        ['lbl_tal','res_ing'].forEach(id=> { if(document.getElementById(id)) document.getElementById(id).innerText="L. "+r.toFixed(2); }); 
+        ['lbl_gas','res_gas'].forEach(id=> { if(document.getElementById(id)) document.getElementById(id).innerText="L. "+g.toFixed(2); }); 
+        ['lbl_ban','res_ban'].forEach(id=> { if(document.getElementById(id)) document.getElementById(id).innerText="L. "+b.toFixed(2); }); 
+        if(document.getElementById('res_com')) document.getElementById('res_com').innerText="L. "+c.toFixed(2); 
+        ['res_neto'].forEach(id=> { if(document.getElementById(id)) document.getElementById(id).innerText="L. "+n.toFixed(2); }); 
 
-        if(totalSys > 0) { 
+        if(totalSys > 0 && document.getElementById('eff-text')) { 
             let eff = Math.round((tc / totalSys) * 100); 
             document.getElementById('eff-text').innerText = `Cobraste ${tc} de ${totalSys} (${eff}%)`; 
             document.getElementById('eff-bar').style.width = eff + "%"; 
@@ -749,16 +718,10 @@
             
             toDeleteCount = bj + rec; 
             const btnContainer = document.getElementById('btn-conciliacion-container'); 
-            
             if(btnContainer) { 
-                if(toDeleteCount > 0) { 
-                    btnContainer.style.display = 'block'; 
-                    document.getElementById('count-to-delete').innerText = toDeleteCount; 
-                } else { 
-                    btnContainer.style.display = 'none'; 
-                } 
+                btnContainer.style.display = toDeleteCount > 0 ? 'block' : 'none'; 
+                document.getElementById('count-to-delete').innerText = toDeleteCount; 
             } 
-            
             if(fi!=="") { 
                 let teo = totalSys + nw - bj - rec; 
                 let dif = parseInt(fi) - teo; 
@@ -770,7 +733,7 @@
     
     ['inv-new','inv-baj','inv-rec','inv-fis'].forEach(id=>{if(document.getElementById(id)) document.getElementById(id).addEventListener('input',calc)});
     
-    // --- VISTA PREVIA ---
+    // --- VISTA PREVIA PDF ---
     window.abrirVistaPrevia = async () => { 
         const c = calc(); 
         document.getElementById('p-zona').innerText = document.getElementById('zonaSelect').value; 
@@ -801,7 +764,7 @@
         cutDate.setDate(cutDate.getDate() - 7); 
         sH.forEach(doc => { const d = doc.data(); const fechaMov = d.fecha.toDate(); if(fechaMov >= cutDate && (d.accion === 'CANCELADA' || d.accion === 'RECOGIDA')) { if (!seenCards.has(d.numero)) { bajas.push(d); seenCards.add(d.numero); } } }); 
         const gridBajas = document.getElementById('p-grid-bajas'); gridBajas.innerHTML = ""; 
-        if(bajas.length > 0) { bajas.forEach(b => { gridBajas.innerHTML += `<div class="baja-item-pdf"><strong>#${b.numero}</strong><br>${b.accion.substring(0,4)}<button class="btn-remove-pdf" onclick="this.parentElement.remove()">X</button></div>`; }); } else { gridBajas.innerHTML = `<div style="grid-column: span 4; text-align:center;">- Ninguna -</div>`; } 
+        if(bajas.length > 0) { bajas.forEach(b => { gridBajas.innerHTML += `<div class="baja-item-pdf"><strong>#${b.numero}</strong><br>${b.accion.substring(0,4)}</div>`; }); } else { gridBajas.innerHTML = `<div style="grid-column: span 4; text-align:center;">- Ninguna -</div>`; } 
         
         const gridNuevas = document.getElementById('p-grid-nuevas'); gridNuevas.innerHTML = ""; 
         if(sessionNewCards.length > 0) { sessionNewCards.forEach(b => { gridNuevas.innerHTML += `<div class="baja-item-pdf"><strong>#${b.numero}</strong><br>NUEVA</div>`; }); } else { gridNuevas.innerHTML = `<div style="grid-column: span 4; text-align:center;">- Ninguna -</div>`; } 
@@ -812,19 +775,13 @@
         document.getElementById('p-teo').innerText=teo; document.getElementById('p-fis').innerText=fi; 
         document.getElementById('p-msg').innerText=document.getElementById('inv-msg').innerText; 
         
-        const pGal = document.getElementById('p-gal-mixed'); 
-        pGal.innerHTML=""; 
-        document.querySelectorAll('#gal-gas img').forEach(i=>{ pGal.innerHTML+=`<div class="pdf-evidence-block"><div class="pdf-evidence-label">GASTO OPERATIVO</div><div class="pdf-image-container"><img src="${i.src}"></div></div>`; }); 
-        document.querySelectorAll('#gal-ban img').forEach(i=>{ pGal.innerHTML+=`<div class="pdf-evidence-block"><div class="pdf-evidence-label">VOUCHER BANCO</div><div class="pdf-image-container"><img src="${i.src}"></div></div>`; }); 
-        
         document.getElementById('app-container').style.display = 'none'; 
         document.getElementById('seccion-impresion').style.display = 'block'; 
         document.getElementById('printControls').style.display = 'flex'; 
     };
-
     window.cerrarVistaPrevia = () => { document.getElementById('seccion-impresion').style.display = 'none'; document.getElementById('printControls').style.display = 'none'; document.getElementById('app-container').style.display = 'block'; }
-    
-    // --- BAJAS Y BASE DE DATOS ---
+
+    // --- MODALES EXTRA ---
     window.openConciliacion = () => { document.getElementById('conciliacionModal').style.display = 'flex'; document.getElementById('cards-to-delete-count').innerText = toDeleteCount; renderModalTable(allCardsCache); }
     window.closeConciliacion = () => { document.getElementById('conciliacionModal').style.display = 'none'; }
     window.searchForDeletion = () => { const term = document.getElementById('modal-search').value.toLowerCase(); const filtered = allCardsCache.filter(c => c.clave.toLowerCase().includes(term) || c.numero.toLowerCase().includes(term)); renderModalTable(filtered); }
@@ -847,7 +804,7 @@
     window.delUser=async(id)=>{ if(confirm("Borrar?")) await deleteDoc(doc(db,"usuarios",id)); loadUsers(); };
     window.loadAdminStats = async () => { const z = document.getElementById('zonaSelect').value; document.getElementById('stat-zona-title').innerText = z; const q = query(collection(db, "historial_cortes"), where("zona", "==", z)); const snap = await getDocs(q); let docsArray = []; snap.forEach(doc => { docsArray.push({ id: doc.id, ...doc.data() }); }); docsArray.sort((a, b) => a.fecha.seconds - b.fecha.seconds); let l=[], d=[], tHTML=""; docsArray.forEach(data => { const date = data.fecha.toDate().toLocaleDateString('es-HN'); l.push(date); d.push(data.recaudado); tHTML += `<tr><td>${date}</td><td>${data.semana||'-'}</td><td>L. ${data.recaudado}</td><td>L. ${data.comision}</td><td><button class="btn-del-row" onclick="deleteStat('${data.id}')">🗑️</button></td></tr>`; }); document.getElementById('admin-stats-body').innerHTML = tHTML; if(adminChartInst) adminChartInst.destroy(); adminChartInst = new Chart(document.getElementById('adminChart'), { type:'line', data:{labels:l, datasets:[{label:'Tendencia Recaudo', data:d, borderColor:'#e74c3c', tension:0.3}]} }); }
     window.deleteStat = async (id) => { if(!confirm("¿Eliminar?")) return; try { await deleteDoc(doc(db, "historial_cortes", id)); alert("Eliminado"); loadAdminStats(); } catch (e) { alert("Error: " + e.message); } }
-    window.cargarDash = async () => { const z = document.getElementById('zonaSelect').value; const dStart = document.getElementById('dash-start').value; const dEnd = document.getElementById('dash-end').value; document.getElementById('dash-zona').innerText = z; document.getElementById('dash-name').innerText = currentUser.username; const qT = query(collection(db, "tarjetas_fisicas"), where("zona", "==", z)); const sT = await getDocs(qT); const currentRouteCards = sT.size; const start = new Date(dStart + "T00:00:00"); const end = new Date(dEnd + "T23:59:59"); const qH = query(collection(db, "historial_cortes"), where("zona", "==", z)); const sH = await getDocs(qH); let docs = []; sH.forEach(doc => docs.push(doc.data())); docs = docs.filter(d => d.fecha.toDate() >= start && d.fecha.toDate() <= end); docs.sort((a,b) => a.fecha.seconds - b.fecha.seconds); let dates=[], recaudos=[], comisiones=[], totRec=0, totCom=0, totCob=0; let tHTML = ""; docs.forEach(dt=>{ const dateStr = dt.fecha.toDate().toLocaleDateString('es-HN',{day:'numeric',month:'short'}); dates.push(dateStr); recaudos.push(dt.recaudado); comisiones.push(dt.comision); totRec+=dt.recaudado||0; totCom+=dt.comision||0; totCob+=dt.tarjetas_cobradas||0; tHTML += `<tr><td>${dateStr}</td><td>${dt.tarjetas_cobradas||0}</td><td>L. ${dt.recaudado.toLocaleString()}</td><td>L. ${dt.comision.toLocaleString()}</td></tr>`; }); document.getElementById('kpi-recaudo').innerText="L. "+totRec.toLocaleString(); document.getElementById('kpi-com').innerText="L. "+totCom.toLocaleString(); document.getElementById('kpi-cobradas').innerText = `${totCob} / ${currentRouteCards}`; document.getElementById('dash-history-body').innerHTML = tHTML; }
+
 </script>
 </body>
 </html>
